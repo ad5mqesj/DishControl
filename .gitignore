@@ -1,0 +1,8 @@
+# Untracked files
+**/obj
+**/bin
+**/.vs
+**/pacakges
+*.exe
+*.dll
+*.obj
