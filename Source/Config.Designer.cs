@@ -68,6 +68,8 @@
             this.label1 = new System.Windows.Forms.Label();
             this.encoder_coding = new System.Windows.Forms.ComboBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.driveEnableBit = new System.Windows.Forms.TextBox();
+            this.label15 = new System.Windows.Forms.Label();
             this.jogIncrement = new System.Windows.Forms.TextBox();
             this.label36 = new System.Windows.Forms.Label();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
@@ -132,8 +134,13 @@
             this.azCB1 = new System.Windows.Forms.Label();
             this.outputPort = new System.Windows.Forms.ComboBox();
             this.label13 = new System.Windows.Forms.Label();
-            this.driveEnableBit = new System.Windows.Forms.TextBox();
-            this.label15 = new System.Windows.Forms.Label();
+            this.PosLog = new System.Windows.Forms.TabPage();
+            this.PosLogFile = new System.Windows.Forms.TextBox();
+            this.label18 = new System.Windows.Forms.Label();
+            this.label19 = new System.Windows.Forms.Label();
+            this.maxPosLogSize = new System.Windows.Forms.TextBox();
+            this.MaxFiles = new System.Windows.Forms.TextBox();
+            this.label37 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -145,6 +152,7 @@
             this.groupBox8.SuspendLayout();
             this.groupBox5.SuspendLayout();
             this.groupBox7.SuspendLayout();
+            this.PosLog.SuspendLayout();
             this.SuspendLayout();
             // 
             // Cancel
@@ -171,6 +179,7 @@
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Controls.Add(this.PosLog);
             this.tabControl1.Location = new System.Drawing.Point(23, 15);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
@@ -555,6 +564,23 @@
             this.tabPage2.Size = new System.Drawing.Size(599, 393);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Drive";
+            // 
+            // driveEnableBit
+            // 
+            this.driveEnableBit.Location = new System.Drawing.Point(500, 20);
+            this.driveEnableBit.Name = "driveEnableBit";
+            this.driveEnableBit.Size = new System.Drawing.Size(59, 20);
+            this.driveEnableBit.TabIndex = 26;
+            this.driveEnableBit.TextChanged += new System.EventHandler(this.driveEnableBit_TextChanged);
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(411, 23);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(83, 13);
+            this.label15.TabIndex = 25;
+            this.label15.Text = "Drive Enable Bit";
             // 
             // jogIncrement
             // 
@@ -1192,22 +1218,72 @@
             this.label13.TabIndex = 0;
             this.label13.Text = "Output Port";
             // 
-            // driveEnableBit
+            // PosLog
             // 
-            this.driveEnableBit.Location = new System.Drawing.Point(500, 20);
-            this.driveEnableBit.Name = "driveEnableBit";
-            this.driveEnableBit.Size = new System.Drawing.Size(59, 20);
-            this.driveEnableBit.TabIndex = 26;
-            this.driveEnableBit.TextChanged += new System.EventHandler(this.driveEnableBit_TextChanged);
+            this.PosLog.BackColor = System.Drawing.Color.LightSteelBlue;
+            this.PosLog.Controls.Add(this.MaxFiles);
+            this.PosLog.Controls.Add(this.label37);
+            this.PosLog.Controls.Add(this.maxPosLogSize);
+            this.PosLog.Controls.Add(this.label19);
+            this.PosLog.Controls.Add(this.PosLogFile);
+            this.PosLog.Controls.Add(this.label18);
+            this.PosLog.Location = new System.Drawing.Point(4, 22);
+            this.PosLog.Name = "PosLog";
+            this.PosLog.Padding = new System.Windows.Forms.Padding(3);
+            this.PosLog.Size = new System.Drawing.Size(599, 393);
+            this.PosLog.TabIndex = 2;
+            this.PosLog.Text = "Position Log";
             // 
-            // label15
+            // PosLogFile
             // 
-            this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(411, 23);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(83, 13);
-            this.label15.TabIndex = 25;
-            this.label15.Text = "Drive Enable Bit";
+            this.PosLogFile.Location = new System.Drawing.Point(81, 17);
+            this.PosLogFile.Name = "PosLogFile";
+            this.PosLogFile.Size = new System.Drawing.Size(280, 20);
+            this.PosLogFile.TabIndex = 26;
+            this.PosLogFile.TextChanged += new System.EventHandler(this.PosLogFile_TextChanged);
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(17, 20);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(58, 13);
+            this.label18.TabIndex = 25;
+            this.label18.Text = "Output File";
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(25, 67);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(50, 13);
+            this.label19.TabIndex = 27;
+            this.label19.Text = "Max Size";
+            // 
+            // maxPosLogSize
+            // 
+            this.maxPosLogSize.Location = new System.Drawing.Point(81, 64);
+            this.maxPosLogSize.Name = "maxPosLogSize";
+            this.maxPosLogSize.Size = new System.Drawing.Size(96, 20);
+            this.maxPosLogSize.TabIndex = 28;
+            this.maxPosLogSize.TextChanged += new System.EventHandler(this.maxPosLogSize_TextChanged);
+            // 
+            // MaxFiles
+            // 
+            this.MaxFiles.Location = new System.Drawing.Point(81, 114);
+            this.MaxFiles.Name = "MaxFiles";
+            this.MaxFiles.Size = new System.Drawing.Size(96, 20);
+            this.MaxFiles.TabIndex = 30;
+            this.MaxFiles.TextChanged += new System.EventHandler(this.MaxFiles_TextChanged);
+            // 
+            // label37
+            // 
+            this.label37.AutoSize = true;
+            this.label37.Location = new System.Drawing.Point(24, 117);
+            this.label37.Name = "label37";
+            this.label37.Size = new System.Drawing.Size(51, 13);
+            this.label37.TabIndex = 29;
+            this.label37.Text = "Max Files";
             // 
             // Config
             // 
@@ -1239,6 +1315,8 @@
             this.groupBox5.PerformLayout();
             this.groupBox7.ResumeLayout(false);
             this.groupBox7.PerformLayout();
+            this.PosLog.ResumeLayout(false);
+            this.PosLog.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -1350,5 +1428,12 @@
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.TextBox driveEnableBit;
         private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.TabPage PosLog;
+        private System.Windows.Forms.TextBox PosLogFile;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.TextBox MaxFiles;
+        private System.Windows.Forms.Label label37;
+        private System.Windows.Forms.TextBox maxPosLogSize;
+        private System.Windows.Forms.Label label19;
     }
 }

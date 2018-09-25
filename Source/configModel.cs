@@ -94,6 +94,10 @@ namespace DishControl
             elOutMax = 16384.0;
             elOutMin = 0.0;
             elPark = 89.99;
+
+            positionFileLog = "c:\\PositionLogs\\Position.log";
+            maxPosLogFiles = 5;
+            maxPosLogSizeBytes = 1024 * 1024 * 10;  //10 MB
         }
 
         public double latitude { get; set; }
@@ -146,5 +150,9 @@ namespace DishControl
         public double elOutMax { get; set; }
         public double elOutMin { get; set; }
         public double elPark { get; set; }
+
+        public string positionFileLog { get; set; }
+        public int maxPosLogSizeBytes { get; set; }
+        public int maxPosLogFiles { get; set; }
     }
 }

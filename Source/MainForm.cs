@@ -35,8 +35,6 @@ namespace DishControl
         configModel settings;
         bool appConfigured = false;
         DishState state = DishState.Unknown;
-        //        System.Windows.Forms.Timer timer = null;
-        //        System.Windows.Forms.Timer watchdog = null;
         HighAccuracyTimer mainTimer = null;
         Encoder azEncoder = null, elEncoder = null;
         bool trackCelestial = false;
@@ -85,16 +83,7 @@ namespace DishControl
                 state = DishState.Unknown;
                 azEncoder = new Encoder(this.dev, this.settings, true);
                 elEncoder = new Encoder(this.dev, this.settings, false);
-                mainTimer = new HighAccuracyTimer(this, timer_Tick, 50);
-                //timer = new System.Windows.Forms.Timer();
-                //timer.Interval = 50;
-                //timer.Enabled = true;
-                //timer.Tick += new EventHandler(timer1_Tick);
-
-                //watchdog = new System.Windows.Forms.Timer();
-                //watchdog.Interval = 10;
-                //watchdog.Enabled = true;
-                //watchdog.Tick += new EventHandler(watchdog_Tick);
+                mainTimer = new HighAccuracyTimer(this, timer_Tick, 10);
 
                 azPid = new PID(settings.azKp, settings.azKi, settings.azKd, settings.azMax, settings.azMin, settings.azOutMax, settings.azOutMin, this.azReadPosition, this.azSetpoint, this.setAz);
                 azPid.resolution = (settings.azMax - settings.azMin) / (double)((1 << settings.AzimuthEncoderBits) - 1);
@@ -112,62 +101,22 @@ namespace DishControl
 
         private void buttonThreadHandler()
         {
-            double velocity = this.settings.jogIncrement * (double)this.currentIncrement;
-            int rampsteps = (int)(velocity * 20.0);
-            if (rampsteps < 1) rampsteps = 1;
-            double curvel = 0.1;
+           double curvel = this.settings.jogIncrement;
             double dirMul = 1.0;
             if (this.direction == buttonDir.South || this.direction == buttonDir.East)
                 dirMul = -1.0;
             if (this.direction == buttonDir.South || this.direction == buttonDir.North)
             {
-                for (int i = 0; i < rampsteps; i++)
-                {
-//                    curvel += curvel * (double)i;
-                    if (curvel > 1.0)
-                    {
-                        curvel = 1.0;
-                    }
-                    this.setEl(curvel * dirMul);
-                    Thread.Sleep(50);
-                }
-                for (int i = rampsteps - 1; i >= 0; i--)
-                {
-  //                  curvel -= curvel * (double)i;
-                    if (curvel < -1.0)
-                    {
-                        curvel = -1.0;
-                    }
-                    this.setEl(curvel * dirMul);
-                    Thread.Sleep(50);
-                }
+                this.setEl(curvel * dirMul);
+                Thread.Sleep(250);
                 this.setEl(0.0);
             }
             else
             {
-                for (int i = 0; i < rampsteps; i++)
-                {
-    //                curvel += curvel * (double)i;
-                    if (curvel > 1.0)
-                    {
-                        curvel = 1.0;
-                    }
-                    this.setAz(curvel * dirMul);
-                    Thread.Sleep(50);
-                }
-                for (int i = rampsteps - 1; i >= 0; i--)
-                {
-//                    curvel -= curvel * (double)i;
-                    if (curvel < -1.0)
-                    {
-                        curvel = -1.0;
-                    }
-                    this.setAz(curvel * dirMul);
-                    Thread.Sleep(50);
-                }
+                this.setAz(curvel * dirMul);
+                Thread.Sleep(2550);
                 this.setAz(0.0);
             }
-            currentIncrement = 1;
         }
         private void enableControls()
         {
@@ -223,12 +172,9 @@ namespace DishControl
                 MessageBox.Show("Please configure the eht32 in Options->Settings");
                 return;
             }
-            //if (timer != null && timer.Enabled)
-            //    timer.Stop();
-            //if (watchdog != null && watchdog.Enabled)
-            //    watchdog.Stop();
             if (mainTimer != null)
                 mainTimer.Stop();
+
             // If we're already connected, disconnect and reconnect
            if (dev.Connected && !bSameAddress)
             {
@@ -270,7 +216,6 @@ namespace DishControl
                     this.setEl(0.0);
                     this.enableDrive(true);
                     mainTimer.Start();
-                    //watchdog.Start();
                 }
             }
             catch (Eth32Exception etherr)
@@ -371,15 +316,9 @@ namespace DishControl
             return this.elCommand;
         }
 
-        //bool oldDir = false;
         public void setAz(double azVel)
         {
             bool azDir = (azVel > 0.05);
-            //if (oldDir != azDir)
-            //{
-            //    oldDir = azDir;
-                
-            //}
             if (dev.Connected)
             {
                 lock (this.dev)
@@ -621,25 +560,6 @@ namespace DishControl
             }
         }
 
-        //private void timer1_Tick(object sender, EventArgs e)
-        //{
-        //    updatePosition();
-        //    updateStatus();
-        //}
-
-        //private void watchdog_Tick()
-        //{
-        //    WatchdoLoopcount++;
-        //    if (WatchdoLoopcount > 5)
-        //        WatchdoLoopcount = 0;
-        //    int bitState = (WatchdoLoopcount) % 5 > 0 ? 1 : 0;
-        //    lock (this.dev)
-        //    {
-        //        this.dev.OutputBit(4, 0, bitState);
-        //    }
-        //}
-
-
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (dev != null)
@@ -647,9 +567,6 @@ namespace DishControl
                 this.enableDrive(false);
                 if (mainTimer != null)
                     mainTimer.Stop();
-                //if (watchdog != null)
-                //    watchdog.Stop();
-
                // dev is at least instantiated
                 if (dev.Connected)
                 {
@@ -663,12 +580,12 @@ namespace DishControl
         {
             string startingIP = settings.eth32Address;
             mainTimer.Stop();
-//            watchdog.Stop();
             Config cfgDialog = new Config(dev, this.settings);
             if (cfgDialog.ShowDialog() == DialogResult.OK)
             {
                 string configFile = Application.StartupPath + "\\dishConfig.xml";
                 configFileHandler.writeConfig(configFile, cfgDialog.settings);
+                RollingLogger.setupRollingLogger(settings.positionFileLog, settings.maxPosLogSizeBytes, settings.maxPosLogFiles);
                 MessageBox.Show("Saved");
                 appConfigured = true;
             }

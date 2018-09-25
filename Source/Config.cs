@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -123,6 +124,10 @@ namespace DishControl
                 this.elOutMax.Text = settings.elOutMax.ToString();
                 this.elOutMin.Text = settings.elOutMin.ToString();
                 this.elPark.Text = settings.elPark.ToString();
+
+                this.PosLogFile.Text = settings.positionFileLog;
+                this.maxPosLogSize.Text = settings.maxPosLogSizeBytes.ToString();
+                this.MaxFiles.Text = settings.maxPosLogFiles.ToString();
             }
         }
 
@@ -626,5 +631,55 @@ namespace DishControl
             settings.alpha = d;
         }
 
+        private void PosLogFile_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                Path.GetFullPath(this.PosLogFile.Text);
+            }
+            catch (PathTooLongException ex)
+            {
+                MessageBox.Show("File name is not valid : "+ex.Message);
+                return;
+            }
+            settings.positionFileLog = this.PosLogFile.Text;
+        }
+
+        private void maxPosLogSize_TextChanged(object sender, EventArgs e)
+        {
+            int i;
+            Int32.TryParse(this.maxPosLogSize.Text, out i);
+            if (this.maxPosLogSize.Text.ToLower().Contains ("k"))
+            {
+                i *= 1024;
+            }
+            if (this.maxPosLogSize.Text.ToLower().Contains("m"))
+            {
+                i *= 1024*1024;
+            }
+            if (this.maxPosLogSize.Text.ToLower().Contains("g"))
+            {
+                i *= 1024 * 1024 * 1024;
+            }
+
+            if (i < 0 || i > 1*1024*1024*1024)
+            {
+                MessageBox.Show("File size must be greater than 0 and less than 1GB");
+                return;
+            }
+            settings.maxPosLogSizeBytes = i;
+        }
+
+        private void MaxFiles_TextChanged(object sender, EventArgs e)
+        {
+            int i;
+            Int32.TryParse(this.MaxFiles.Text, out i);
+            if (i < 0 || i > 100)
+            {
+                MessageBox.Show("Number of files can range from 0 to 100");
+                return;
+            }
+            settings.maxPosLogFiles = i;
+        }
     }
 }
