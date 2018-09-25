@@ -57,9 +57,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Program Files (x86)\winford\eth32\api\windows\ms.net\Eth32.dll</HintPath>
     </Reference>
-    <Reference Include="NmeaParser.WinDesktop, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpGIS.NmeaParser.1.6.0\lib\net40-client\NmeaParser.WinDesktop.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="NmeaParser, Version=1.9.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpGIS.NmeaParser.1.10.0\lib\net451\NmeaParser.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

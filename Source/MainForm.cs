@@ -35,8 +35,9 @@ namespace DishControl
         configModel settings;
         bool appConfigured = false;
         DishState state = DishState.Unknown;
-        System.Windows.Forms.Timer timer = null;
-        System.Windows.Forms.Timer watchdog = null;
+        //        System.Windows.Forms.Timer timer = null;
+        //        System.Windows.Forms.Timer watchdog = null;
+        HighAccuracyTimer mainTimer = null;
         Encoder azEncoder = null, elEncoder = null;
         bool trackCelestial = false;
         bool trackMoon = false;
@@ -84,15 +85,16 @@ namespace DishControl
                 state = DishState.Unknown;
                 azEncoder = new Encoder(this.dev, this.settings, true);
                 elEncoder = new Encoder(this.dev, this.settings, false);
-                timer = new System.Windows.Forms.Timer();
-                timer.Interval = 50;
-                timer.Enabled = true;
-                timer.Tick += new EventHandler(timer1_Tick);
+                mainTimer = new HighAccuracyTimer(this, timer_Tick, 50);
+                //timer = new System.Windows.Forms.Timer();
+                //timer.Interval = 50;
+                //timer.Enabled = true;
+                //timer.Tick += new EventHandler(timer1_Tick);
 
-                watchdog = new System.Windows.Forms.Timer();
-                watchdog.Interval = 10;
-                watchdog.Enabled = true;
-                watchdog.Tick += new EventHandler(watchdog_Tick);
+                //watchdog = new System.Windows.Forms.Timer();
+                //watchdog.Interval = 10;
+                //watchdog.Enabled = true;
+                //watchdog.Tick += new EventHandler(watchdog_Tick);
 
                 azPid = new PID(settings.azKp, settings.azKi, settings.azKd, settings.azMax, settings.azMin, settings.azOutMax, settings.azOutMin, this.azReadPosition, this.azSetpoint, this.setAz);
                 azPid.resolution = (settings.azMax - settings.azMin) / (double)((1 << settings.AzimuthEncoderBits) - 1);
@@ -221,12 +223,14 @@ namespace DishControl
                 MessageBox.Show("Please configure the eht32 in Options->Settings");
                 return;
             }
-            if (timer != null && timer.Enabled)
-                timer.Stop();
-            if (watchdog != null && watchdog.Enabled)
-                watchdog.Stop();
+            //if (timer != null && timer.Enabled)
+            //    timer.Stop();
+            //if (watchdog != null && watchdog.Enabled)
+            //    watchdog.Stop();
+            if (mainTimer != null)
+                mainTimer.Stop();
             // If we're already connected, disconnect and reconnect
-            if (dev.Connected && !bSameAddress)
+           if (dev.Connected && !bSameAddress)
             {
                 enableDrive(false);
                 Thread.Sleep(1000);
@@ -265,8 +269,8 @@ namespace DishControl
                     this.setAz(0.0);
                     this.setEl(0.0);
                     this.enableDrive(true);
-                    timer.Start();
-                    watchdog.Start();
+                    mainTimer.Start();
+                    //watchdog.Start();
                 }
             }
             catch (Eth32Exception etherr)
@@ -366,15 +370,16 @@ namespace DishControl
         {
             return this.elCommand;
         }
-        bool oldDir = false;
+
+        //bool oldDir = false;
         public void setAz(double azVel)
         {
             bool azDir = (azVel > 0.05);
-            if (oldDir != azDir)
-            {
-                oldDir = azDir;
+            //if (oldDir != azDir)
+            //{
+            //    oldDir = azDir;
                 
-            }
+            //}
             if (dev.Connected)
             {
                 lock (this.dev)
@@ -598,23 +603,41 @@ namespace DishControl
             }
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-            updatePosition();
-            updateStatus();
-        }
-
-        private void watchdog_Tick(object sender, EventArgs e)
+        private void timer_Tick ()
         {
             WatchdoLoopcount++;
-            if (WatchdoLoopcount > 5)
+            if (WatchdoLoopcount > 49)
                 WatchdoLoopcount = 0;
-            int bitState = (WatchdoLoopcount) % 5 > 0 ? 1 : 0;
+            int bitState = (WatchdoLoopcount) % 4 > 0 ? 1 : 0; //1:5 duty cycle
             lock (this.dev)
             {
                 this.dev.OutputBit(4, 0, bitState);
             }
+            if (WatchdoLoopcount %4 == 0) // 1/5th rate 
+            {
+                updatePosition();
+                updateStatus();
+
+            }
         }
+
+        //private void timer1_Tick(object sender, EventArgs e)
+        //{
+        //    updatePosition();
+        //    updateStatus();
+        //}
+
+        //private void watchdog_Tick()
+        //{
+        //    WatchdoLoopcount++;
+        //    if (WatchdoLoopcount > 5)
+        //        WatchdoLoopcount = 0;
+        //    int bitState = (WatchdoLoopcount) % 5 > 0 ? 1 : 0;
+        //    lock (this.dev)
+        //    {
+        //        this.dev.OutputBit(4, 0, bitState);
+        //    }
+        //}
 
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -622,12 +645,12 @@ namespace DishControl
             if (dev != null)
             {
                 this.enableDrive(false);
-                if (timer != null)
-                    timer.Stop();
-                if (watchdog != null)
-                    watchdog.Stop();
+                if (mainTimer != null)
+                    mainTimer.Stop();
+                //if (watchdog != null)
+                //    watchdog.Stop();
 
-                // dev is at least instantiated
+               // dev is at least instantiated
                 if (dev.Connected)
                 {
                     dev.Disconnect();
@@ -639,8 +662,8 @@ namespace DishControl
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string startingIP = settings.eth32Address;
-            timer.Stop();
-            watchdog.Stop();
+            mainTimer.Stop();
+//            watchdog.Stop();
             Config cfgDialog = new Config(dev, this.settings);
             if (cfgDialog.ShowDialog() == DialogResult.OK)
             {

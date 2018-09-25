@@ -25,26 +25,37 @@ namespace DishControl
         Action mAction;
         Form mForm;
         private int mTimerId;
+        private int Delay;
         private TimerEventDel mHandler;  // NOTE: declare at class scope so garbage collector doesn't release it!!!
 
+        public bool Enabled {get; set;}
         public HighAccuracyTimer(Form form, Action action, int delay)
         {
             mAction = action;
             mForm = form;
             timeBeginPeriod(1);
             mHandler = new TimerEventDel(TimerCallback);
-            mTimerId = timeSetEvent(delay, 0, mHandler, IntPtr.Zero, EVENT_TYPE);
+            Delay = delay;
         }
 
+        public void Start()
+        {
+            Enabled = true;
+            mTimerId = timeSetEvent(Delay, 0, mHandler, IntPtr.Zero, EVENT_TYPE);
+        }
         public void Stop()
         {
             int err = timeKillEvent(mTimerId);
             timeEndPeriod(1);
             System.Threading.Thread.Sleep(100);// Ensure callbacks are drained
+            mTimerId = 0;
+            Enabled = false;
         }
 
         private void TimerCallback(int id, int msg, IntPtr user, int dw1, int dw2)
         {
+            if (!Enabled)
+                return;
             if (mTimerId != 0)
                 mForm.BeginInvoke(mAction);
         }
