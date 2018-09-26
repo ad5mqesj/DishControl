@@ -56,7 +56,7 @@ namespace DishControl
         {
             if (!Enabled)
                 return;
-            if (mTimerId != 0)
+            if (mTimerId != 0 && mForm.IsHandleCreated) 
                 mForm.BeginInvoke(mAction);
         }
     }

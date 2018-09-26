@@ -29,6 +29,22 @@ namespace DishControl
         North,
         South
     };
+    public class presets
+    {
+        public presets()
+        {
+            Id = 0;
+            Name = "";
+            Az = 0.0;
+            El = 0.0;
+        }
+
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public double Az { get; set; }
+        public double El { get; set; }
+    }
+
     public partial class MainForm : Form
     {
         Eth32 dev = null;
@@ -51,7 +67,7 @@ namespace DishControl
         Thread buttonThread;
         int currentIncrement = 0;
         buttonDir direction;
-
+        List<presets> Presets = null;
 
        public MainForm(Eth32 dev)
         {
@@ -76,8 +92,22 @@ namespace DishControl
                     appConfigured = true;
                 }
             }
+            Presets = new List<presets>();
+            presets none = new presets()
+            {
+                Id = 0,
+                Name = "None",
+
+            }
             if (appConfigured)
             {
+                presetSelector.Items.Add(new { Name = "None", Id = 0 });
+                presetSelector.Items.Add(new { Name = settings.Preset1Name, Id = 1 });
+                presetSelector.Items.Add(new { Name = settings.Preset2Name, Id = 2 });
+                presetSelector.Items.Add(new { Name = settings.Preset3Name, Id = 3 });
+                presetSelector.Items.Add(new { Name = settings.Preset4Name, Id = 4 });
+                presetSelector.Items.Add(new { Name = settings.Preset5Name, Id = 5 });
+
                 string resultString = Regex.Match(settings.outputPort, @"\d+").Value;
                 Int32.TryParse(resultString, out outputPortNum);
                 state = DishState.Unknown;
@@ -93,9 +123,10 @@ namespace DishControl
 
                 azPos = settings.azPark;
                 elPos = settings.elPark;
+
+                Connect();
                 updateStatus();
                 updatePosition();
-                Connect();
             }
         }
 
@@ -114,7 +145,7 @@ namespace DishControl
             else
             {
                 this.setAz(curvel * dirMul);
-                Thread.Sleep(2550);
+                Thread.Sleep(250);
                 this.setAz(0.0);
             }
         }
@@ -220,7 +251,9 @@ namespace DishControl
             }
             catch (Eth32Exception etherr)
             {
+#if !_TEST
                 MessageBox.Show("Error connecting to the ETH32: " + Eth32.ErrorString(etherr.ErrorCode));
+#endif
             }
         }
 
@@ -454,6 +487,16 @@ namespace DishControl
                 elPos = elEncoder.countsToDegrees(elEncoder.readNormalizedEncoderBits());
             }
 
+            GeoAngle AzAngle = GeoAngle.FromDouble(azPos, true);
+            GeoAngle ElAngle = GeoAngle.FromDouble(elPos);
+
+            RaDec astro = celestialConversion.CalcualteRaDec(elPos, azPos, settings.latitude, settings.longitude);
+            GeoAngle Dec = GeoAngle.FromDouble(astro.Dec);
+            GeoAngle RA = GeoAngle.FromDouble(astro.RA, true);
+
+            string posLog = string.Format("RA {0:D3} : {1:D2}\t DEC {2:D3} : {3:D2}", RA.Degrees, RA.Minutes, Dec.Degrees, Dec.Minutes);
+            RollingLogger.LogMessage(posLog);
+
             while (bUpdating)
             {
                 Thread.Sleep(50);
@@ -462,11 +505,9 @@ namespace DishControl
                     bUpdating = false;
                 }
             }
-            GeoAngle AzAngle = GeoAngle.FromDouble(azPos, true);
-            GeoAngle ElAngle = GeoAngle.FromDouble(elPos);
             this.Azimuth.Text = string.Format("{0:D3} : {1:D2}", AzAngle.Degrees, AzAngle.Minutes);
             this.Elevation.Text = string.Format("{0:D2} : {1:D2}", ElAngle.Degrees, ElAngle.Minutes);
-            //this.Elevation.Text = string.Format("{0:D4}", elEncoder.readNormalizedEncoderBits());
+
             if (azCommand == -1.0)
             {
                 this.commandAz.Text = this.Azimuth.Text;
@@ -475,9 +516,6 @@ namespace DishControl
                 elCommand = elPos;
             }
 
-            RaDec astro = celestialConversion.CalcualteRaDec(elPos, azPos, settings.latitude, settings.longitude);
-            GeoAngle Dec = GeoAngle.FromDouble(astro.Dec);
-            GeoAngle RA = GeoAngle.FromDouble(astro.RA, true);
 
             this.RA.Text = string.Format("{0:D3} : {1:D2}", RA.Degrees, RA.Minutes);
             this.DEC.Text = string.Format("{0:D2} : {1:D2}", Dec.Degrees, Dec.Minutes);
@@ -678,6 +716,12 @@ namespace DishControl
         {
             testDrive testDialog = new testDrive(dev, this.settings, this);
             testDialog.ShowDialog();
+
+        }
+
+        private void presetSelector_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var item = presetSelector.SelectedItem;
 
         }
 

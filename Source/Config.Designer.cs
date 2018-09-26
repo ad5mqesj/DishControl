@@ -135,12 +135,43 @@
             this.outputPort = new System.Windows.Forms.ComboBox();
             this.label13 = new System.Windows.Forms.Label();
             this.PosLog = new System.Windows.Forms.TabPage();
-            this.PosLogFile = new System.Windows.Forms.TextBox();
-            this.label18 = new System.Windows.Forms.Label();
-            this.label19 = new System.Windows.Forms.Label();
-            this.maxPosLogSize = new System.Windows.Forms.TextBox();
             this.MaxFiles = new System.Windows.Forms.TextBox();
             this.label37 = new System.Windows.Forms.Label();
+            this.maxPosLogSize = new System.Windows.Forms.TextBox();
+            this.label19 = new System.Windows.Forms.Label();
+            this.PosLogFile = new System.Windows.Forms.TextBox();
+            this.label18 = new System.Windows.Forms.Label();
+            this.Preset = new System.Windows.Forms.TabPage();
+            this.PS5El = new System.Windows.Forms.TextBox();
+            this.label50 = new System.Windows.Forms.Label();
+            this.PS5Az = new System.Windows.Forms.TextBox();
+            this.label51 = new System.Windows.Forms.Label();
+            this.PS5Name = new System.Windows.Forms.TextBox();
+            this.label52 = new System.Windows.Forms.Label();
+            this.PS4El = new System.Windows.Forms.TextBox();
+            this.label47 = new System.Windows.Forms.Label();
+            this.PS4Az = new System.Windows.Forms.TextBox();
+            this.label48 = new System.Windows.Forms.Label();
+            this.PS4Name = new System.Windows.Forms.TextBox();
+            this.label49 = new System.Windows.Forms.Label();
+            this.PS3El = new System.Windows.Forms.TextBox();
+            this.label44 = new System.Windows.Forms.Label();
+            this.PS3Az = new System.Windows.Forms.TextBox();
+            this.label45 = new System.Windows.Forms.Label();
+            this.PS3Name = new System.Windows.Forms.TextBox();
+            this.label46 = new System.Windows.Forms.Label();
+            this.PS2El = new System.Windows.Forms.TextBox();
+            this.label41 = new System.Windows.Forms.Label();
+            this.PS2Az = new System.Windows.Forms.TextBox();
+            this.label42 = new System.Windows.Forms.Label();
+            this.PS2Name = new System.Windows.Forms.TextBox();
+            this.label43 = new System.Windows.Forms.Label();
+            this.PS1El = new System.Windows.Forms.TextBox();
+            this.label40 = new System.Windows.Forms.Label();
+            this.PS1Az = new System.Windows.Forms.TextBox();
+            this.label39 = new System.Windows.Forms.Label();
+            this.PS1Name = new System.Windows.Forms.TextBox();
+            this.label38 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -153,6 +184,7 @@
             this.groupBox5.SuspendLayout();
             this.groupBox7.SuspendLayout();
             this.PosLog.SuspendLayout();
+            this.Preset.SuspendLayout();
             this.SuspendLayout();
             // 
             // Cancel
@@ -180,6 +212,7 @@
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Controls.Add(this.PosLog);
+            this.tabControl1.Controls.Add(this.Preset);
             this.tabControl1.Location = new System.Drawing.Point(23, 15);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
@@ -1234,6 +1267,40 @@
             this.PosLog.TabIndex = 2;
             this.PosLog.Text = "Position Log";
             // 
+            // MaxFiles
+            // 
+            this.MaxFiles.Location = new System.Drawing.Point(81, 114);
+            this.MaxFiles.Name = "MaxFiles";
+            this.MaxFiles.Size = new System.Drawing.Size(96, 20);
+            this.MaxFiles.TabIndex = 30;
+            this.MaxFiles.TextChanged += new System.EventHandler(this.MaxFiles_TextChanged);
+            // 
+            // label37
+            // 
+            this.label37.AutoSize = true;
+            this.label37.Location = new System.Drawing.Point(24, 117);
+            this.label37.Name = "label37";
+            this.label37.Size = new System.Drawing.Size(51, 13);
+            this.label37.TabIndex = 29;
+            this.label37.Text = "Max Files";
+            // 
+            // maxPosLogSize
+            // 
+            this.maxPosLogSize.Location = new System.Drawing.Point(81, 64);
+            this.maxPosLogSize.Name = "maxPosLogSize";
+            this.maxPosLogSize.Size = new System.Drawing.Size(96, 20);
+            this.maxPosLogSize.TabIndex = 28;
+            this.maxPosLogSize.TextChanged += new System.EventHandler(this.maxPosLogSize_TextChanged);
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(25, 67);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(50, 13);
+            this.label19.TabIndex = 27;
+            this.label19.Text = "Max Size";
+            // 
             // PosLogFile
             // 
             this.PosLogFile.Location = new System.Drawing.Point(81, 17);
@@ -1251,39 +1318,300 @@
             this.label18.TabIndex = 25;
             this.label18.Text = "Output File";
             // 
-            // label19
+            // Preset
             // 
-            this.label19.AutoSize = true;
-            this.label19.Location = new System.Drawing.Point(25, 67);
-            this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(50, 13);
-            this.label19.TabIndex = 27;
-            this.label19.Text = "Max Size";
+            this.Preset.BackColor = System.Drawing.Color.LightSteelBlue;
+            this.Preset.Controls.Add(this.PS5El);
+            this.Preset.Controls.Add(this.label50);
+            this.Preset.Controls.Add(this.PS5Az);
+            this.Preset.Controls.Add(this.label51);
+            this.Preset.Controls.Add(this.PS5Name);
+            this.Preset.Controls.Add(this.label52);
+            this.Preset.Controls.Add(this.PS4El);
+            this.Preset.Controls.Add(this.label47);
+            this.Preset.Controls.Add(this.PS4Az);
+            this.Preset.Controls.Add(this.label48);
+            this.Preset.Controls.Add(this.PS4Name);
+            this.Preset.Controls.Add(this.label49);
+            this.Preset.Controls.Add(this.PS3El);
+            this.Preset.Controls.Add(this.label44);
+            this.Preset.Controls.Add(this.PS3Az);
+            this.Preset.Controls.Add(this.label45);
+            this.Preset.Controls.Add(this.PS3Name);
+            this.Preset.Controls.Add(this.label46);
+            this.Preset.Controls.Add(this.PS2El);
+            this.Preset.Controls.Add(this.label41);
+            this.Preset.Controls.Add(this.PS2Az);
+            this.Preset.Controls.Add(this.label42);
+            this.Preset.Controls.Add(this.PS2Name);
+            this.Preset.Controls.Add(this.label43);
+            this.Preset.Controls.Add(this.PS1El);
+            this.Preset.Controls.Add(this.label40);
+            this.Preset.Controls.Add(this.PS1Az);
+            this.Preset.Controls.Add(this.label39);
+            this.Preset.Controls.Add(this.PS1Name);
+            this.Preset.Controls.Add(this.label38);
+            this.Preset.Location = new System.Drawing.Point(4, 22);
+            this.Preset.Name = "Preset";
+            this.Preset.Padding = new System.Windows.Forms.Padding(3);
+            this.Preset.Size = new System.Drawing.Size(599, 393);
+            this.Preset.TabIndex = 3;
+            this.Preset.Text = "Preset";
             // 
-            // maxPosLogSize
+            // PS5El
             // 
-            this.maxPosLogSize.Location = new System.Drawing.Point(81, 64);
-            this.maxPosLogSize.Name = "maxPosLogSize";
-            this.maxPosLogSize.Size = new System.Drawing.Size(96, 20);
-            this.maxPosLogSize.TabIndex = 28;
-            this.maxPosLogSize.TextChanged += new System.EventHandler(this.maxPosLogSize_TextChanged);
+            this.PS5El.Location = new System.Drawing.Point(509, 172);
+            this.PS5El.Name = "PS5El";
+            this.PS5El.Size = new System.Drawing.Size(80, 20);
+            this.PS5El.TabIndex = 56;
+            this.PS5El.TextChanged += new System.EventHandler(this.PS5El_TextChanged);
             // 
-            // MaxFiles
+            // label50
             // 
-            this.MaxFiles.Location = new System.Drawing.Point(81, 114);
-            this.MaxFiles.Name = "MaxFiles";
-            this.MaxFiles.Size = new System.Drawing.Size(96, 20);
-            this.MaxFiles.TabIndex = 30;
-            this.MaxFiles.TextChanged += new System.EventHandler(this.MaxFiles_TextChanged);
+            this.label50.AutoSize = true;
+            this.label50.Location = new System.Drawing.Point(442, 175);
+            this.label50.Name = "label50";
+            this.label50.Size = new System.Drawing.Size(61, 13);
+            this.label50.TabIndex = 55;
+            this.label50.Text = "Preset 5 E l";
             // 
-            // label37
+            // PS5Az
             // 
-            this.label37.AutoSize = true;
-            this.label37.Location = new System.Drawing.Point(24, 117);
-            this.label37.Name = "label37";
-            this.label37.Size = new System.Drawing.Size(51, 13);
-            this.label37.TabIndex = 29;
-            this.label37.Text = "Max Files";
+            this.PS5Az.Location = new System.Drawing.Point(361, 172);
+            this.PS5Az.Name = "PS5Az";
+            this.PS5Az.Size = new System.Drawing.Size(75, 20);
+            this.PS5Az.TabIndex = 54;
+            this.PS5Az.TextChanged += new System.EventHandler(this.PS5Az_TextChanged);
+            // 
+            // label51
+            // 
+            this.label51.AutoSize = true;
+            this.label51.Location = new System.Drawing.Point(294, 175);
+            this.label51.Name = "label51";
+            this.label51.Size = new System.Drawing.Size(61, 13);
+            this.label51.TabIndex = 53;
+            this.label51.Text = "Preset 5 Az";
+            // 
+            // PS5Name
+            // 
+            this.PS5Name.Location = new System.Drawing.Point(92, 172);
+            this.PS5Name.Name = "PS5Name";
+            this.PS5Name.Size = new System.Drawing.Size(192, 20);
+            this.PS5Name.TabIndex = 52;
+            this.PS5Name.TextChanged += new System.EventHandler(this.PS5Name_TextChanged);
+            // 
+            // label52
+            // 
+            this.label52.AutoSize = true;
+            this.label52.Location = new System.Drawing.Point(9, 175);
+            this.label52.Name = "label52";
+            this.label52.Size = new System.Drawing.Size(77, 13);
+            this.label52.TabIndex = 51;
+            this.label52.Text = "Preset 5 Name";
+            // 
+            // PS4El
+            // 
+            this.PS4El.Location = new System.Drawing.Point(509, 132);
+            this.PS4El.Name = "PS4El";
+            this.PS4El.Size = new System.Drawing.Size(80, 20);
+            this.PS4El.TabIndex = 50;
+            this.PS4El.TextChanged += new System.EventHandler(this.PS4El_TextChanged);
+            // 
+            // label47
+            // 
+            this.label47.AutoSize = true;
+            this.label47.Location = new System.Drawing.Point(442, 135);
+            this.label47.Name = "label47";
+            this.label47.Size = new System.Drawing.Size(61, 13);
+            this.label47.TabIndex = 49;
+            this.label47.Text = "Preset 4 E l";
+            // 
+            // PS4Az
+            // 
+            this.PS4Az.Location = new System.Drawing.Point(361, 132);
+            this.PS4Az.Name = "PS4Az";
+            this.PS4Az.Size = new System.Drawing.Size(75, 20);
+            this.PS4Az.TabIndex = 48;
+            this.PS4Az.TextChanged += new System.EventHandler(this.PS4Az_TextChanged);
+            // 
+            // label48
+            // 
+            this.label48.AutoSize = true;
+            this.label48.Location = new System.Drawing.Point(294, 135);
+            this.label48.Name = "label48";
+            this.label48.Size = new System.Drawing.Size(61, 13);
+            this.label48.TabIndex = 47;
+            this.label48.Text = "Preset 4 Az";
+            // 
+            // PS4Name
+            // 
+            this.PS4Name.Location = new System.Drawing.Point(92, 132);
+            this.PS4Name.Name = "PS4Name";
+            this.PS4Name.Size = new System.Drawing.Size(192, 20);
+            this.PS4Name.TabIndex = 46;
+            this.PS4Name.TextChanged += new System.EventHandler(this.PS4Name_TextChanged);
+            // 
+            // label49
+            // 
+            this.label49.AutoSize = true;
+            this.label49.Location = new System.Drawing.Point(9, 135);
+            this.label49.Name = "label49";
+            this.label49.Size = new System.Drawing.Size(77, 13);
+            this.label49.TabIndex = 45;
+            this.label49.Text = "Preset 4 Name";
+            // 
+            // PS3El
+            // 
+            this.PS3El.Location = new System.Drawing.Point(509, 92);
+            this.PS3El.Name = "PS3El";
+            this.PS3El.Size = new System.Drawing.Size(80, 20);
+            this.PS3El.TabIndex = 44;
+            this.PS3El.TextChanged += new System.EventHandler(this.PS3El_TextChanged);
+            // 
+            // label44
+            // 
+            this.label44.AutoSize = true;
+            this.label44.Location = new System.Drawing.Point(442, 95);
+            this.label44.Name = "label44";
+            this.label44.Size = new System.Drawing.Size(61, 13);
+            this.label44.TabIndex = 43;
+            this.label44.Text = "Preset 3 E l";
+            // 
+            // PS3Az
+            // 
+            this.PS3Az.Location = new System.Drawing.Point(361, 92);
+            this.PS3Az.Name = "PS3Az";
+            this.PS3Az.Size = new System.Drawing.Size(75, 20);
+            this.PS3Az.TabIndex = 42;
+            this.PS3Az.TextChanged += new System.EventHandler(this.PS3Az_TextChanged);
+            // 
+            // label45
+            // 
+            this.label45.AutoSize = true;
+            this.label45.Location = new System.Drawing.Point(294, 95);
+            this.label45.Name = "label45";
+            this.label45.Size = new System.Drawing.Size(61, 13);
+            this.label45.TabIndex = 41;
+            this.label45.Text = "Preset 3 Az";
+            // 
+            // PS3Name
+            // 
+            this.PS3Name.Location = new System.Drawing.Point(92, 92);
+            this.PS3Name.Name = "PS3Name";
+            this.PS3Name.Size = new System.Drawing.Size(192, 20);
+            this.PS3Name.TabIndex = 40;
+            this.PS3Name.TextChanged += new System.EventHandler(this.PS3Name_TextChanged);
+            // 
+            // label46
+            // 
+            this.label46.AutoSize = true;
+            this.label46.Location = new System.Drawing.Point(9, 95);
+            this.label46.Name = "label46";
+            this.label46.Size = new System.Drawing.Size(77, 13);
+            this.label46.TabIndex = 39;
+            this.label46.Text = "Preset 3 Name";
+            // 
+            // PS2El
+            // 
+            this.PS2El.Location = new System.Drawing.Point(509, 53);
+            this.PS2El.Name = "PS2El";
+            this.PS2El.Size = new System.Drawing.Size(80, 20);
+            this.PS2El.TabIndex = 38;
+            this.PS2El.TextChanged += new System.EventHandler(this.PS2El_TextChanged);
+            // 
+            // label41
+            // 
+            this.label41.AutoSize = true;
+            this.label41.Location = new System.Drawing.Point(442, 56);
+            this.label41.Name = "label41";
+            this.label41.Size = new System.Drawing.Size(61, 13);
+            this.label41.TabIndex = 37;
+            this.label41.Text = "Preset 2 E l";
+            // 
+            // PS2Az
+            // 
+            this.PS2Az.Location = new System.Drawing.Point(361, 53);
+            this.PS2Az.Name = "PS2Az";
+            this.PS2Az.Size = new System.Drawing.Size(75, 20);
+            this.PS2Az.TabIndex = 36;
+            this.PS2Az.TextChanged += new System.EventHandler(this.PS2Az_TextChanged);
+            // 
+            // label42
+            // 
+            this.label42.AutoSize = true;
+            this.label42.Location = new System.Drawing.Point(294, 56);
+            this.label42.Name = "label42";
+            this.label42.Size = new System.Drawing.Size(61, 13);
+            this.label42.TabIndex = 35;
+            this.label42.Text = "Preset 2 Az";
+            // 
+            // PS2Name
+            // 
+            this.PS2Name.Location = new System.Drawing.Point(92, 53);
+            this.PS2Name.Name = "PS2Name";
+            this.PS2Name.Size = new System.Drawing.Size(192, 20);
+            this.PS2Name.TabIndex = 34;
+            this.PS2Name.TextChanged += new System.EventHandler(this.PS2Name_TextChanged);
+            // 
+            // label43
+            // 
+            this.label43.AutoSize = true;
+            this.label43.Location = new System.Drawing.Point(9, 56);
+            this.label43.Name = "label43";
+            this.label43.Size = new System.Drawing.Size(77, 13);
+            this.label43.TabIndex = 33;
+            this.label43.Text = "Preset 2 Name";
+            // 
+            // PS1El
+            // 
+            this.PS1El.Location = new System.Drawing.Point(509, 15);
+            this.PS1El.Name = "PS1El";
+            this.PS1El.Size = new System.Drawing.Size(80, 20);
+            this.PS1El.TabIndex = 32;
+            this.PS1El.TextChanged += new System.EventHandler(this.PS1El_TextChanged);
+            // 
+            // label40
+            // 
+            this.label40.AutoSize = true;
+            this.label40.Location = new System.Drawing.Point(442, 18);
+            this.label40.Name = "label40";
+            this.label40.Size = new System.Drawing.Size(61, 13);
+            this.label40.TabIndex = 31;
+            this.label40.Text = "Preset 1 E l";
+            // 
+            // PS1Az
+            // 
+            this.PS1Az.Location = new System.Drawing.Point(361, 15);
+            this.PS1Az.Name = "PS1Az";
+            this.PS1Az.Size = new System.Drawing.Size(75, 20);
+            this.PS1Az.TabIndex = 30;
+            this.PS1Az.TextChanged += new System.EventHandler(this.PS1Az_TextChanged);
+            // 
+            // label39
+            // 
+            this.label39.AutoSize = true;
+            this.label39.Location = new System.Drawing.Point(294, 18);
+            this.label39.Name = "label39";
+            this.label39.Size = new System.Drawing.Size(61, 13);
+            this.label39.TabIndex = 29;
+            this.label39.Text = "Preset 1 Az";
+            // 
+            // PS1Name
+            // 
+            this.PS1Name.Location = new System.Drawing.Point(92, 15);
+            this.PS1Name.Name = "PS1Name";
+            this.PS1Name.Size = new System.Drawing.Size(192, 20);
+            this.PS1Name.TabIndex = 28;
+            this.PS1Name.TextChanged += new System.EventHandler(this.PS1Name_TextChanged);
+            // 
+            // label38
+            // 
+            this.label38.AutoSize = true;
+            this.label38.Location = new System.Drawing.Point(9, 18);
+            this.label38.Name = "label38";
+            this.label38.Size = new System.Drawing.Size(77, 13);
+            this.label38.TabIndex = 27;
+            this.label38.Text = "Preset 1 Name";
             // 
             // Config
             // 
@@ -1317,6 +1645,8 @@
             this.groupBox7.PerformLayout();
             this.PosLog.ResumeLayout(false);
             this.PosLog.PerformLayout();
+            this.Preset.ResumeLayout(false);
+            this.Preset.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -1435,5 +1765,36 @@
         private System.Windows.Forms.Label label37;
         private System.Windows.Forms.TextBox maxPosLogSize;
         private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.TabPage Preset;
+        private System.Windows.Forms.TextBox PS5El;
+        private System.Windows.Forms.Label label50;
+        private System.Windows.Forms.TextBox PS5Az;
+        private System.Windows.Forms.Label label51;
+        private System.Windows.Forms.TextBox PS5Name;
+        private System.Windows.Forms.Label label52;
+        private System.Windows.Forms.TextBox PS4El;
+        private System.Windows.Forms.Label label47;
+        private System.Windows.Forms.TextBox PS4Az;
+        private System.Windows.Forms.Label label48;
+        private System.Windows.Forms.TextBox PS4Name;
+        private System.Windows.Forms.Label label49;
+        private System.Windows.Forms.TextBox PS3El;
+        private System.Windows.Forms.Label label44;
+        private System.Windows.Forms.TextBox PS3Az;
+        private System.Windows.Forms.Label label45;
+        private System.Windows.Forms.TextBox PS3Name;
+        private System.Windows.Forms.Label label46;
+        private System.Windows.Forms.TextBox PS2El;
+        private System.Windows.Forms.Label label41;
+        private System.Windows.Forms.TextBox PS2Az;
+        private System.Windows.Forms.Label label42;
+        private System.Windows.Forms.TextBox PS2Name;
+        private System.Windows.Forms.Label label43;
+        private System.Windows.Forms.TextBox PS1El;
+        private System.Windows.Forms.Label label40;
+        private System.Windows.Forms.TextBox PS1Az;
+        private System.Windows.Forms.Label label39;
+        private System.Windows.Forms.TextBox PS1Name;
+        private System.Windows.Forms.Label label38;
     }
 }

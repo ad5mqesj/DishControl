@@ -128,6 +128,26 @@ namespace DishControl
                 this.PosLogFile.Text = settings.positionFileLog;
                 this.maxPosLogSize.Text = settings.maxPosLogSizeBytes.ToString();
                 this.MaxFiles.Text = settings.maxPosLogFiles.ToString();
+
+                this.PS1Name.Text = settings.Preset1Name;
+                this.PS1Az.Text =  settings.Preset1Az.ToString();
+                this.PS1El.Text =  settings.Preset1El.ToString();
+
+                this.PS2Name.Text = settings.Preset2Name;
+                this.PS2Az.Text =  settings.Preset2Az.ToString();
+                this.PS2El.Text =  settings.Preset2El.ToString();
+
+                this.PS3Name.Text = settings.Preset3Name;
+                this.PS3Az.Text =  settings.Preset3Az.ToString();
+                this.PS3El.Text =  settings.Preset3El.ToString();
+
+                this.PS4Name.Text = settings.Preset4Name;
+                this.PS4Az.Text =  settings.Preset4Az.ToString();
+                this.PS4El.Text =  settings.Preset4El.ToString();
+
+                this.PS5Name.Text = settings.Preset5Name;
+                this.PS5Az.Text =  settings.Preset5Az.ToString();
+                this.PS5El.Text =  settings.Preset5El.ToString();
             }
         }
 
@@ -680,6 +700,105 @@ namespace DishControl
                 return;
             }
             settings.maxPosLogFiles = i;
+        }
+
+        private void PS1Name_TextChanged(object sender, EventArgs e)
+        {
+            settings.Preset1Name = PS1Name.Text;
+        }
+
+        private void PS1Az_TextChanged(object sender, EventArgs e)
+        {
+            double d;
+            double.TryParse(this.PS1Az.Text, out d);
+            settings.Preset1Az = d;
+        }
+
+        private void PS1El_TextChanged(object sender, EventArgs e)
+        {
+            double d;
+            double.TryParse(this.PS1El.Text, out d);
+            settings.Preset1El = d;
+        }
+
+        private void PS2Name_TextChanged(object sender, EventArgs e)
+        {
+            settings.Preset2Name = PS2Name.Text;
+        }
+
+        private void PS2Az_TextChanged(object sender, EventArgs e)
+        {
+            double d;
+            double.TryParse(this.PS2Az.Text, out d);
+            settings.Preset2Az = d;
+
+        }
+
+        private void PS2El_TextChanged(object sender, EventArgs e)
+        {
+            double d;
+            double.TryParse(this.PS2El.Text, out d);
+            settings.Preset2El = d;
+        }
+
+        private void PS3Name_TextChanged(object sender, EventArgs e)
+        {
+            settings.Preset3Name = PS3Name.Text;
+
+        }
+
+        private void PS3Az_TextChanged(object sender, EventArgs e)
+        {
+            double d;
+            double.TryParse(this.PS3Az.Text, out d);
+            settings.Preset3Az = d;
+
+        }
+
+        private void PS3El_TextChanged(object sender, EventArgs e)
+        {
+            double d;
+            double.TryParse(this.PS3El.Text, out d);
+            settings.Preset3El = d;
+        }
+
+        private void PS4Name_TextChanged(object sender, EventArgs e)
+        {
+            settings.Preset4Name = PS4Name.Text;
+        }
+
+        private void PS4Az_TextChanged(object sender, EventArgs e)
+        {
+            double d;
+            double.TryParse(this.PS4Az.Text, out d);
+            settings.Preset4Az = d;
+        }
+
+        private void PS4El_TextChanged(object sender, EventArgs e)
+        {
+            double d;
+            double.TryParse(this.PS4El.Text, out d);
+            settings.Preset4El = d;
+        }
+
+        private void PS5Name_TextChanged(object sender, EventArgs e)
+        {
+            settings.Preset5Name = PS5Name.Text;
+        }
+
+        private void PS5Az_TextChanged(object sender, EventArgs e)
+        {
+            double d;
+            double.TryParse(this.PS5Az.Text, out d);
+            settings.Preset5Az = d;
+
+        }
+
+        private void PS5El_TextChanged(object sender, EventArgs e)
+        {
+            double d;
+            double.TryParse(this.PS5El.Text, out d);
+            settings.Preset5El = d;
         }
     }
 }

@@ -98,6 +98,10 @@ namespace DishControl
             positionFileLog = "c:\\PositionLogs\\Position.log";
             maxPosLogFiles = 5;
             maxPosLogSizeBytes = 1024 * 1024 * 10;  //10 MB
+
+            Preset1Name = Preset2Name = Preset3Name = Preset4Name = Preset5Name = "";
+            Preset1Az = Preset2Az = Preset3Az = Preset4Az = Preset5Az = 0.0;
+            Preset5El = Preset4El = Preset3El = Preset2El = Preset1El = 0.0;
         }
 
         public double latitude { get; set; }
@@ -154,5 +158,21 @@ namespace DishControl
         public string positionFileLog { get; set; }
         public int maxPosLogSizeBytes { get; set; }
         public int maxPosLogFiles { get; set; }
+
+        public string Preset1Name { get; set; }
+        public double Preset1Az { get; set; }
+        public double Preset1El { get; set; }
+        public string Preset2Name { get; set; }
+        public double Preset2Az { get; set; }
+        public double Preset2El { get; set; }
+        public string Preset3Name { get; set; }
+        public double Preset3Az { get; set; }
+        public double Preset3El { get; set; }
+        public string Preset4Name { get; set; }
+        public double Preset4Az { get; set; }
+        public double Preset4El { get; set; }
+        public string Preset5Name { get; set; }
+        public double Preset5Az { get; set; }
+        public double Preset5El { get; set; }
     }
 }

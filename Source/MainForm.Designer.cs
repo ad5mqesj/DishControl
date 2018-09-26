@@ -34,6 +34,7 @@ namespace DishControl
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.driveTestToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.label1 = new System.Windows.Forms.Label();
             this.RA = new System.Windows.Forms.Label();
             this.DEC = new System.Windows.Forms.Label();
@@ -69,7 +70,8 @@ namespace DishControl
             this.CCW = new System.Windows.Forms.Button();
             this.Down = new System.Windows.Forms.Button();
             this.Message = new System.Windows.Forms.Label();
-            this.driveTestToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.label2 = new System.Windows.Forms.Label();
+            this.presetSelector = new System.Windows.Forms.ComboBox();
             this.menuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -91,7 +93,7 @@ namespace DishControl
             // 
             // statusStrip1
             // 
-            this.statusStrip1.Location = new System.Drawing.Point(0, 361);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 370);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(744, 22);
             this.statusStrip1.TabIndex = 6;
@@ -119,9 +121,16 @@ namespace DishControl
             // settingsToolStripMenuItem
             // 
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.settingsToolStripMenuItem.Text = "Settings";
             this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
+            // 
+            // driveTestToolStripMenuItem
+            // 
+            this.driveTestToolStripMenuItem.Name = "driveTestToolStripMenuItem";
+            this.driveTestToolStripMenuItem.Size = new System.Drawing.Size(70, 20);
+            this.driveTestToolStripMenuItem.Text = "Drive Test";
+            this.driveTestToolStripMenuItem.Click += new System.EventHandler(this.driveTestToolStripMenuItem_Click);
             // 
             // label1
             // 
@@ -226,6 +235,8 @@ namespace DishControl
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.presetSelector);
+            this.groupBox2.Controls.Add(this.label2);
             this.groupBox2.Controls.Add(this.lunarTrack);
             this.groupBox2.Controls.Add(this.track);
             this.groupBox2.Controls.Add(this.STOP);
@@ -239,16 +250,16 @@ namespace DishControl
             this.groupBox2.Controls.Add(this.label8);
             this.groupBox2.Controls.Add(this.label11);
             this.groupBox2.Controls.Add(this.label12);
-            this.groupBox2.Location = new System.Drawing.Point(12, 149);
+            this.groupBox2.Location = new System.Drawing.Point(12, 151);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(390, 189);
+            this.groupBox2.Size = new System.Drawing.Size(390, 211);
             this.groupBox2.TabIndex = 17;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Command Position";
             // 
             // lunarTrack
             // 
-            this.lunarTrack.Location = new System.Drawing.Point(164, 122);
+            this.lunarTrack.Location = new System.Drawing.Point(164, 149);
             this.lunarTrack.Name = "lunarTrack";
             this.lunarTrack.Size = new System.Drawing.Size(75, 23);
             this.lunarTrack.TabIndex = 23;
@@ -259,9 +270,10 @@ namespace DishControl
             // track
             // 
             this.track.AutoSize = true;
-            this.track.Location = new System.Drawing.Point(170, 39);
+            this.track.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.track.Location = new System.Drawing.Point(170, 28);
             this.track.Name = "track";
-            this.track.Size = new System.Drawing.Size(54, 17);
+            this.track.Size = new System.Drawing.Size(61, 19);
             this.track.TabIndex = 22;
             this.track.Text = "Track";
             this.track.UseVisualStyleBackColor = true;
@@ -269,7 +281,7 @@ namespace DishControl
             // 
             // STOP
             // 
-            this.STOP.Location = new System.Drawing.Point(299, 160);
+            this.STOP.Location = new System.Drawing.Point(299, 178);
             this.STOP.Name = "STOP";
             this.STOP.Size = new System.Drawing.Size(75, 23);
             this.STOP.TabIndex = 21;
@@ -279,7 +291,7 @@ namespace DishControl
             // 
             // Park
             // 
-            this.Park.Location = new System.Drawing.Point(164, 160);
+            this.Park.Location = new System.Drawing.Point(164, 178);
             this.Park.Name = "Park";
             this.Park.Size = new System.Drawing.Size(75, 23);
             this.Park.TabIndex = 20;
@@ -289,7 +301,7 @@ namespace DishControl
             // 
             // GO
             // 
-            this.GO.Location = new System.Drawing.Point(10, 160);
+            this.GO.Location = new System.Drawing.Point(10, 178);
             this.GO.Name = "GO";
             this.GO.Size = new System.Drawing.Size(75, 23);
             this.GO.TabIndex = 19;
@@ -299,7 +311,7 @@ namespace DishControl
             // 
             // commandEl
             // 
-            this.commandEl.Location = new System.Drawing.Point(283, 84);
+            this.commandEl.Location = new System.Drawing.Point(283, 112);
             this.commandEl.Name = "commandEl";
             this.commandEl.Size = new System.Drawing.Size(100, 20);
             this.commandEl.TabIndex = 18;
@@ -307,7 +319,7 @@ namespace DishControl
             // 
             // commandAz
             // 
-            this.commandAz.Location = new System.Drawing.Point(64, 84);
+            this.commandAz.Location = new System.Drawing.Point(64, 112);
             this.commandAz.Name = "commandAz";
             this.commandAz.Size = new System.Drawing.Size(100, 20);
             this.commandAz.TabIndex = 17;
@@ -315,7 +327,7 @@ namespace DishControl
             // 
             // commandDec
             // 
-            this.commandDec.Location = new System.Drawing.Point(283, 37);
+            this.commandDec.Location = new System.Drawing.Point(283, 28);
             this.commandDec.Name = "commandDec";
             this.commandDec.Size = new System.Drawing.Size(100, 20);
             this.commandDec.TabIndex = 16;
@@ -323,7 +335,7 @@ namespace DishControl
             // 
             // commandRA
             // 
-            this.commandRA.Location = new System.Drawing.Point(64, 39);
+            this.commandRA.Location = new System.Drawing.Point(64, 30);
             this.commandRA.Name = "commandRA";
             this.commandRA.Size = new System.Drawing.Size(100, 20);
             this.commandRA.TabIndex = 15;
@@ -333,7 +345,7 @@ namespace DishControl
             // 
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label7.Location = new System.Drawing.Point(5, 33);
+            this.label7.Location = new System.Drawing.Point(5, 24);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(59, 26);
             this.label7.TabIndex = 8;
@@ -343,7 +355,7 @@ namespace DishControl
             // 
             this.label8.AutoSize = true;
             this.label8.Font = new System.Drawing.Font("Microsoft Tai Le", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label8.Location = new System.Drawing.Point(230, 78);
+            this.label8.Location = new System.Drawing.Point(230, 106);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(31, 29);
             this.label8.TabIndex = 14;
@@ -353,7 +365,7 @@ namespace DishControl
             // 
             this.label11.AutoSize = true;
             this.label11.Font = new System.Drawing.Font("Microsoft Tai Le", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label11.Location = new System.Drawing.Point(230, 33);
+            this.label11.Location = new System.Drawing.Point(230, 24);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(55, 29);
             this.label11.TabIndex = 10;
@@ -363,7 +375,7 @@ namespace DishControl
             // 
             this.label12.AutoSize = true;
             this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label12.Location = new System.Drawing.Point(6, 78);
+            this.label12.Location = new System.Drawing.Point(6, 106);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(40, 26);
             this.label12.TabIndex = 12;
@@ -446,7 +458,7 @@ namespace DishControl
             // 
             this.Up.AccessibleDescription = "Elevation Up";
             this.Up.Image = ((System.Drawing.Image)(resources.GetObject("Up.Image")));
-            this.Up.Location = new System.Drawing.Point(527, 175);
+            this.Up.Location = new System.Drawing.Point(527, 208);
             this.Up.Name = "Up";
             this.Up.Size = new System.Drawing.Size(56, 41);
             this.Up.TabIndex = 19;
@@ -457,7 +469,7 @@ namespace DishControl
             // 
             this.CW.AccessibleDescription = "Azimuth clockwise";
             this.CW.Image = ((System.Drawing.Image)(resources.GetObject("CW.Image")));
-            this.CW.Location = new System.Drawing.Point(485, 222);
+            this.CW.Location = new System.Drawing.Point(485, 255);
             this.CW.Name = "CW";
             this.CW.Size = new System.Drawing.Size(42, 56);
             this.CW.TabIndex = 20;
@@ -468,7 +480,7 @@ namespace DishControl
             // 
             this.CCW.AccessibleDescription = "Azimuth counter-clockwise";
             this.CCW.Image = ((System.Drawing.Image)(resources.GetObject("CCW.Image")));
-            this.CCW.Location = new System.Drawing.Point(581, 222);
+            this.CCW.Location = new System.Drawing.Point(581, 255);
             this.CCW.Name = "CCW";
             this.CCW.Size = new System.Drawing.Size(42, 56);
             this.CCW.TabIndex = 21;
@@ -479,7 +491,7 @@ namespace DishControl
             // 
             this.Down.AccessibleDescription = "Elevation Down";
             this.Down.Image = ((System.Drawing.Image)(resources.GetObject("Down.Image")));
-            this.Down.Location = new System.Drawing.Point(527, 284);
+            this.Down.Location = new System.Drawing.Point(527, 317);
             this.Down.Name = "Down";
             this.Down.Size = new System.Drawing.Size(56, 42);
             this.Down.TabIndex = 22;
@@ -495,18 +507,31 @@ namespace DishControl
             this.Message.Size = new System.Drawing.Size(0, 13);
             this.Message.TabIndex = 23;
             // 
-            // driveTestToolStripMenuItem
+            // label2
             // 
-            this.driveTestToolStripMenuItem.Name = "driveTestToolStripMenuItem";
-            this.driveTestToolStripMenuItem.Size = new System.Drawing.Size(70, 20);
-            this.driveTestToolStripMenuItem.Text = "Drive Test";
-            this.driveTestToolStripMenuItem.Click += new System.EventHandler(this.driveTestToolStripMenuItem_Click);
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(3, 69);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(55, 17);
+            this.label2.TabIndex = 24;
+            this.label2.Text = "Preset";
+            // 
+            // presetSelector
+            // 
+            this.presetSelector.AllowDrop = true;
+            this.presetSelector.FormattingEnabled = true;
+            this.presetSelector.Location = new System.Drawing.Point(64, 69);
+            this.presetSelector.Name = "presetSelector";
+            this.presetSelector.Size = new System.Drawing.Size(191, 21);
+            this.presetSelector.TabIndex = 25;
+            this.presetSelector.SelectedIndexChanged += new System.EventHandler(this.presetSelector_SelectedIndexChanged);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(744, 383);
+            this.ClientSize = new System.Drawing.Size(744, 392);
             this.Controls.Add(this.Message);
             this.Controls.Add(this.Down);
             this.Controls.Add(this.CCW);
@@ -579,6 +604,8 @@ namespace DishControl
         private System.Windows.Forms.Button Down;
         private System.Windows.Forms.Label Message;
         private System.Windows.Forms.ToolStripMenuItem driveTestToolStripMenuItem;
+        private System.Windows.Forms.ComboBox presetSelector;
+        private System.Windows.Forms.Label label2;
     }
 }
 
