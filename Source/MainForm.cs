@@ -29,22 +29,6 @@ namespace DishControl
         North,
         South
     };
-    public class presets
-    {
-        public presets()
-        {
-            Id = 0;
-            Name = "";
-            Az = 0.0;
-            El = 0.0;
-        }
-
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public double Az { get; set; }
-        public double El { get; set; }
-    }
-
     public partial class MainForm : Form
     {
         Eth32 dev = null;
@@ -95,18 +79,63 @@ namespace DishControl
             Presets = new List<presets>();
             presets none = new presets()
             {
-                Id = 0,
-                Name = "None",
+                Value = 0,
+                Text = "None",
+                Az = 0.0,
+                El = 0.0
+            };
+            Presets.Add(none);
+            presets ps1 = new presets()
+            {
+                Value = 1,
+                Text = settings.Preset1Name,
+                Az = settings.Preset1Az,
+                El = settings.Preset1El
+            };
+            Presets.Add(ps1);
+            presets ps2 = new presets()
+            {
+                Value = 2,
+                Text = settings.Preset2Name,
+                Az = settings.Preset2Az,
+                El = settings.Preset2El
+            };
+            Presets.Add(ps2);
+            presets ps3 = new presets()
+            {
+                Value = 3,
+                Text = settings.Preset3Name,
+                Az = settings.Preset3Az,
+                El = settings.Preset3El
+            };
+            Presets.Add(ps3);
+            presets ps4 = new presets()
+            {
+                Value = 4,
+                Text = settings.Preset4Name,
+                Az = settings.Preset4Az,
+                El = settings.Preset4El
+            };
+            Presets.Add(ps4);
+            presets ps5 = new presets()
+            {
+                Value = 5,
+                Text = settings.Preset5Name,
+                Az = settings.Preset5Az,
+                El = settings.Preset5El
+            };
+            Presets.Add(ps5);
 
-            }
             if (appConfigured)
             {
-                presetSelector.Items.Add(new { Name = "None", Id = 0 });
-                presetSelector.Items.Add(new { Name = settings.Preset1Name, Id = 1 });
-                presetSelector.Items.Add(new { Name = settings.Preset2Name, Id = 2 });
-                presetSelector.Items.Add(new { Name = settings.Preset3Name, Id = 3 });
-                presetSelector.Items.Add(new { Name = settings.Preset4Name, Id = 4 });
-                presetSelector.Items.Add(new { Name = settings.Preset5Name, Id = 5 });
+                foreach (presets p in Presets)
+                {
+                    if (!String.IsNullOrEmpty (p.Text))
+                    {
+                        presetSelector.Items.Add(p.Text);
+                    }
+                }
+                presetSelector.SelectedIndex = 0;
 
                 string resultString = Regex.Match(settings.outputPort, @"\d+").Value;
                 Int32.TryParse(resultString, out outputPortNum);
@@ -127,6 +156,7 @@ namespace DishControl
                 Connect();
                 updateStatus();
                 updatePosition();
+                RollingLogger.setupRollingLogger(settings.positionFileLog, settings.maxPosLogSizeBytes, settings.maxPosLogFiles);
             }
         }
 
@@ -495,7 +525,12 @@ namespace DishControl
             GeoAngle RA = GeoAngle.FromDouble(astro.RA, true);
 
             string posLog = string.Format("RA {0:D3} : {1:D2}\t DEC {2:D3} : {3:D2}", RA.Degrees, RA.Minutes, Dec.Degrees, Dec.Minutes);
-            RollingLogger.LogMessage(posLog);
+            currentIncrement++;
+            if (currentIncrement % 99 == 0)
+            {
+//                RollingLogger.LogMessage(posLog);
+                currentIncrement = 0;
+            }
 
             while (bUpdating)
             {
@@ -721,8 +756,24 @@ namespace DishControl
 
         private void presetSelector_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var item = presetSelector.SelectedItem;
+            int item = presetSelector.SelectedIndex;
+            if (item != 0)
+            {
+                this.azCommand = this.Presets[item].Az;
+                this.elCommand = this.Presets[item].El;
+                GeoAngle mAzAngle = GeoAngle.FromDouble(azCommand, true);
+                GeoAngle mElAngle = GeoAngle.FromDouble(elCommand);
+                this.commandAz.Text = string.Format("{0} : {1}", mAzAngle.Degrees, mAzAngle.Minutes);
+                this.commandEl.Text = string.Format("{0} : {1}", mElAngle.Degrees, mElAngle.Minutes);
 
+                RaDec astro = celestialConversion.CalcualteRaDec(mElAngle.ToDouble(), mAzAngle.ToDouble(), settings.latitude, settings.longitude);
+                GeoAngle Dec = GeoAngle.FromDouble(astro.Dec);
+                GeoAngle RA = GeoAngle.FromDouble(astro.RA, true);
+
+                this.commandRA.Text = string.Format("{0:D3} : {1:D2}", RA.Degrees, RA.Minutes);
+                this.commandDec.Text = string.Format("{0:D2} : {1:D2}", Dec.Degrees, Dec.Minutes);
+
+            }
         }
 
         private void Stop()
@@ -736,7 +787,6 @@ namespace DishControl
         }
         private void Up_Click(object sender, EventArgs e)
         {
-            this.currentIncrement++;
             this.direction = buttonDir.North;
             if (!this.buttonThread.IsAlive)
                 this.buttonThread = new Thread(this.buttonThreadHandler);
@@ -745,7 +795,6 @@ namespace DishControl
 
         private void Down_Click(object sender, EventArgs e)
         {
-            this.currentIncrement++;
             this.direction = buttonDir.South;
             if (!this.buttonThread.IsAlive)
                 this.buttonThread = new Thread(this.buttonThreadHandler);
@@ -754,7 +803,6 @@ namespace DishControl
 
         private void CW_Click(object sender, EventArgs e)
         {
-            this.currentIncrement++;
             this.direction = buttonDir.East;
             if (!this.buttonThread.IsAlive)
                 this.buttonThread = new Thread(this.buttonThreadHandler);
@@ -763,7 +811,6 @@ namespace DishControl
 
         private void CCW_Click(object sender, EventArgs e)
         {
-            this.currentIncrement++;
             this.direction = buttonDir.West;
             if (!this.buttonThread.IsAlive)
                 this.buttonThread = new Thread(this.buttonThreadHandler);

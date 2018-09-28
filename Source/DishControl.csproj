@@ -87,7 +87,9 @@
     <Compile Include="Eth32Fake.cs" />
     <Compile Include="GeoAngle.cs" />
     <Compile Include="HighAccuracyTimer.cs" />
-    <Compile Include="MainForm.cs" />
+    <Compile Include="MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
@@ -116,6 +118,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <EmbeddedResource Include="testDrive.resx">
       <DependentUpon>testDrive.cs</DependentUpon>

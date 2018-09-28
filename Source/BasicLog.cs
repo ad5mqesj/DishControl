@@ -63,7 +63,12 @@ namespace DishControl
                 RollLogFile(LOG_FILE);
                 Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
                 string timeStamp = String.Format("{0:G}  \t",DateTime.UtcNow);
-                File.AppendAllText(LOG_FILE, timeStamp + msg + Environment.NewLine, Encoding.UTF8);
+                try
+                {
+                    File.AppendAllText(LOG_FILE, timeStamp + msg + Environment.NewLine, Encoding.UTF8);
+                }
+                catch (Exception)
+                { }
             }
         }
 

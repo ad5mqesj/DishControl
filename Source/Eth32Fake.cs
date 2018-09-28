@@ -74,9 +74,11 @@ public class Eth32Exception : Exception
         public DigPort()
         {
             data = 0;
+            oldValue = 0xff;
             portDir = 0;
         }
         public byte data { get; set; }
+        public byte oldValue { get; set; }
         public byte portDir { get; set; }
     }
 
@@ -285,7 +287,6 @@ public class Eth32Exception : Exception
                 error = "bit out of range";
                 return;
             }
-            BasicLog.writeLog(String.Format ("OutputBit(port: {0}, bit: {1}, val: {2})", port, bit, val));
             byte data = (byte)((val & 0x01) >> bit);
             if (data > 0)
             {
@@ -295,6 +296,13 @@ public class Eth32Exception : Exception
             {
                 this.Ports[port].data &= (byte)(~data);
             }
+
+            if (this.Ports[port].data != this.Ports[port].oldValue)
+            {
+                BasicLog.writeLog(String.Format("OutputBit(port: {0}, bit: {1}, val: {2})", port, bit, val));
+                this.Ports[port].oldValue = this.Ports[port].data;
+            }
+
         }
         public void OutputByte(int port, int val)
         {
@@ -303,8 +311,13 @@ public class Eth32Exception : Exception
                 error = "port out of range";
                 return;
             }
-            BasicLog.writeLog(String.Format("OutputByte(port: {0}, val: {1})", port, val));
+
             this.Ports[port].data = (byte)val;
+            if (this.Ports[port].data != this.Ports[port].oldValue)
+            {
+                BasicLog.writeLog(String.Format("OutputByte(port: {0}, val: {1})", port, val));
+                this.Ports[port].oldValue = this.Ports[port].data;
+            }
         }
         public int Readback(int port)
         {

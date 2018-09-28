@@ -44,6 +44,22 @@ namespace DishControl
         }
     }
 
+    public class presets
+    {
+        public presets()
+        {
+            Value = 0;
+            Text = "";
+            Az = 0.0;
+            El = 0.0;
+        }
+
+        public int Value { get; set; }
+        public string Text { get; set; }
+        public double Az { get; set; }
+        public double El { get; set; }
+    }
+
     public class configModel
     {
         public configModel()
