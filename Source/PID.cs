@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DishControl;
+using System;
 using System.Threading;
 
 namespace PIDLibrary
@@ -139,7 +140,6 @@ namespace PIDLibrary
             runThread.IsBackground = true;
             runThread.Name = "PID Processor";
             runThread.Start();
-            motionComplete = false;
         }
 
         public void Disable()
@@ -197,7 +197,7 @@ namespace PIDLibrary
             sp = Clamp(sp, pvMin, pvMax);
             sp = ScaleValue(sp, pvMin, pvMax, -10.0f, 10.0f);
 
-            double res = ScaleValue(resolution, pvMin, pvMax, 0.0f, 20.0f);
+            double res =  ScaleValue(resolution, pvMin, pvMax, 0.0f, 20.0f);
             //Now the error is in percent...
             double err = sp - pv;
             if (Math.Abs(err) <= res)
@@ -237,10 +237,11 @@ namespace PIDLibrary
             //Now we have to scale the output value to match the requested scale
             double outReal = pTerm + iTerm + dTerm;
 
-            outReal = Clamp(outReal, -10.0f, 10.0f);
-            outReal = ScaleValue(outReal, -10.0f, 10.0f, outMin, outMax);
+            //outReal = Clamp(outReal, -10.0f, 10.0f);
+            //outReal = ScaleValue(outReal, -10.0f, 10.0f, outMin, outMax);
 
             //Write it out to the world
+            outReal = Clamp(outReal, outMin, outMax);
             writeOV(outReal);
         }
 
@@ -261,7 +262,7 @@ namespace PIDLibrary
                 }
                 catch (Exception e)
                 {
-
+                    BasicLog.writeLog(e.Message);
                 }
             }
 

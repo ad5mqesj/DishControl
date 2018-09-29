@@ -58,6 +58,7 @@ namespace DishControl
             string configFile = Application.StartupPath + "\\dishConfig.xml";
             jogEvent = new ManualResetEvent(false);
             this.buttonThread = new Thread(buttonThreadHandler);
+            this.buttonThread.Start();
 
             if (File.Exists(configFile))
             {
@@ -143,10 +144,10 @@ namespace DishControl
                 elEncoder = new Encoder(this.dev, this.settings, false);
                 mainTimer = new HighAccuracyTimer(this, timer_Tick, TimerTickms);
 
-                azPid = new PID(settings.azKp, settings.azKi, settings.azKd, settings.azMax, settings.azMin, settings.azOutMax, settings.azOutMin, this.azReadPosition, this.azSetpoint, this.setAz);
+                azPid = new PID(settings.azKp, settings.azKi, settings.azKd, 360.0, 0.0, settings.azOutMax, settings.azOutMin, this.azReadPosition, this.azSetpoint, this.setAz);
                 azPid.resolution = (settings.azMax - settings.azMin) / (double)((1 << settings.AzimuthEncoderBits) - 1);
 
-                elPid = new PID(settings.elKp, settings.elKi, settings.elKd, settings.elMax, settings.elMin, settings.elOutMax, settings.elOutMin, this.elReadPosition, this.elSetpoint, this.setEl);
+                elPid = new PID(settings.elKp, settings.elKi, settings.elKd, 360.0, 0.0, settings.elOutMax, settings.elOutMin, this.elReadPosition, this.elSetpoint, this.setEl);
                 elPid.resolution = (settings.elMax - settings.elMin) / (double)((1 << settings.ElevationEncoderBits) - 1);
 
                 azPos = settings.azPark;
@@ -161,15 +162,15 @@ namespace DishControl
 
         private void buttonThreadHandler()
         {
-            double curvel = this.settings.jogIncrement;
-            double dirMul = 1.0;
             while (btEnabled)
             {
                 jogEvent.WaitOne();
                 if (!btEnabled)
                     return;
 
-                    if (this.direction == buttonDir.South || this.direction == buttonDir.East)
+                double curvel = this.settings.jogIncrement;
+                double dirMul = 1.0;
+                if (this.direction == buttonDir.South || this.direction == buttonDir.East)
                     dirMul = -1.0;
                 state = DishState.Moving;
                 updateStatus();
@@ -288,7 +289,6 @@ namespace DishControl
                     this.setEl(0.0);
                     this.enableDrive(true);
                     mainTimer.Start();
-                    this.buttonThread.Start();
                 }
             }
             catch (Eth32Exception etherr)
@@ -428,7 +428,8 @@ namespace DishControl
             {
                 val = 1;
                 val = polarity ? val : (val > 0 ? 0 : 1);
-                this.dev.OutputBit(this.outputPortNum, settings.driveEnablebit, val);
+                if (dev.Connected)
+                    this.dev.OutputBit(this.outputPortNum, settings.driveEnablebit, val);
                 Thread.Sleep(50);
             }
         }
@@ -545,14 +546,14 @@ namespace DishControl
                 currentIncrement = 0;
             }
 
-            while (bUpdating)
-            {
-                Thread.Sleep(50);
-                if (azPid.Complete && elPid.Complete)
-                {
-                    bUpdating = false;
-                }
-            }
+            //while (bUpdating)
+            //{
+            //    Thread.Sleep(50);
+            //    if (azPid.Complete && elPid.Complete)
+            //    {
+            //        bUpdating = false;
+            //    }
+            //}
             this.Azimuth.Text = string.Format("{0:D3} : {1:D2}", AzAngle.Degrees, AzAngle.Minutes);
             this.Elevation.Text = string.Format("{0:D2} : {1:D2}", ElAngle.Degrees, ElAngle.Minutes);
 
