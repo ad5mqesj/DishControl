@@ -194,7 +194,7 @@ public class Eth32Exception : Exception
                 return 0;
             }
             byte dir = Ports[port].portDir;
-            return (dir & (1 >> bit)) << bit;
+            return (dir & (1 << (bit - 1))) << bit;
         }
         public bool GetDirectionBitBool(int port, int bit)
         {
@@ -209,7 +209,7 @@ public class Eth32Exception : Exception
                 return false;
             }
             byte dir = Ports[port].portDir;
-            return (dir & (1 >> bit)) > 0;
+            return (dir & (1 << (bit - 1))) > 0;
         }
         public byte GetDirectionByte(int port)
         {
@@ -248,7 +248,7 @@ public class Eth32Exception : Exception
                 return 0;
             }
             byte data = Ports[port].data;
-            return (data & (1 >> bit)) << bit;
+            return (data & (1 << (bit - 1))) >> bit;
 
         }
         public bool InputBitBool(int port, int bit)
@@ -264,7 +264,7 @@ public class Eth32Exception : Exception
                 return false;
             }
             byte data = Ports[port].data;
-            return (data & (1 >> bit)) > 0;
+            return (data & (1 << (bit - 1))) > 0;
         }
         public int InputByte(int port)
         {
@@ -287,8 +287,8 @@ public class Eth32Exception : Exception
                 error = "bit out of range";
                 return;
             }
-            byte data = (byte)((val & 0x01) >> bit);
-            if (data > 0)
+            byte data = (byte)(1 << bit);
+            if (val > 0)
             {
                 this.Ports[port].data |= data;
             }
@@ -361,7 +361,7 @@ public class Eth32Exception : Exception
                 return;
             }
             BasicLog.writeLog(String.Format("SetDirectionBit(port: {0}, bit: {1}, direction: {2})", port, bit, direction.ToString()));
-            byte dir = (byte)((direction?0x01:0) >> bit);
+            byte dir = (byte)((direction?0x01:0) << (bit - 1));
             if (dir > 0)
             {
                 this.Ports[port].portDir |= dir;
@@ -385,7 +385,7 @@ public class Eth32Exception : Exception
                 return;
             }
             BasicLog.writeLog(String.Format("SetDirectionBit(port: {0}, bit: {1}, direction: {2})", port, bit, direction));
-            byte dir = (byte)((direction&0x01) >> bit);
+            byte dir = (byte)((direction&0x01) << (bit - 1));
             if (dir > 0)
             {
                 this.Ports[port].portDir |= dir;
@@ -405,6 +405,7 @@ public class Eth32Exception : Exception
             PwmChans[channel].state = state;
             PwmChans[channel].freq = freq;
             PwmChans[channel].duty = duty;
+            BasicLog.writeLog(String.Format("SetPwmParameters(channel: {0}, freq: {1}, duty: {2})", channel, freq, duty));
         }
     }
 }

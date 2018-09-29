@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 using System.Windows.Forms;
 
@@ -49,15 +44,19 @@ namespace DishControl
         DateTime messageTime = DateTime.Now;
         int WatchdoLoopcount = 0;
         Thread buttonThread;
+        ManualResetEvent jogEvent;
+        bool btEnabled = true;
         int currentIncrement = 0;
         buttonDir direction;
         List<presets> Presets = null;
+        int TimerTickms = 10;
 
-       public MainForm(Eth32 dev)
+        public MainForm(Eth32 dev)
         {
             InitializeComponent();
             this.dev = dev;
             string configFile = Application.StartupPath + "\\dishConfig.xml";
+            jogEvent = new ManualResetEvent(false);
             this.buttonThread = new Thread(buttonThreadHandler);
 
             if (File.Exists(configFile))
@@ -130,7 +129,7 @@ namespace DishControl
             {
                 foreach (presets p in Presets)
                 {
-                    if (!String.IsNullOrEmpty (p.Text))
+                    if (!String.IsNullOrEmpty(p.Text))
                     {
                         presetSelector.Items.Add(p.Text);
                     }
@@ -142,7 +141,7 @@ namespace DishControl
                 state = DishState.Unknown;
                 azEncoder = new Encoder(this.dev, this.settings, true);
                 elEncoder = new Encoder(this.dev, this.settings, false);
-                mainTimer = new HighAccuracyTimer(this, timer_Tick, 10);
+                mainTimer = new HighAccuracyTimer(this, timer_Tick, TimerTickms);
 
                 azPid = new PID(settings.azKp, settings.azKi, settings.azKd, settings.azMax, settings.azMin, settings.azOutMax, settings.azOutMin, this.azReadPosition, this.azSetpoint, this.setAz);
                 azPid.resolution = (settings.azMax - settings.azMin) / (double)((1 << settings.AzimuthEncoderBits) - 1);
@@ -162,21 +161,33 @@ namespace DishControl
 
         private void buttonThreadHandler()
         {
-           double curvel = this.settings.jogIncrement;
+            double curvel = this.settings.jogIncrement;
             double dirMul = 1.0;
-            if (this.direction == buttonDir.South || this.direction == buttonDir.East)
-                dirMul = -1.0;
-            if (this.direction == buttonDir.South || this.direction == buttonDir.North)
+            while (btEnabled)
             {
-                this.setEl(curvel * dirMul);
-                Thread.Sleep(250);
-                this.setEl(0.0);
-            }
-            else
-            {
-                this.setAz(curvel * dirMul);
-                Thread.Sleep(250);
-                this.setAz(0.0);
+                jogEvent.WaitOne();
+                if (!btEnabled)
+                    return;
+
+                    if (this.direction == buttonDir.South || this.direction == buttonDir.East)
+                    dirMul = -1.0;
+                state = DishState.Moving;
+                updateStatus();
+                if (this.direction == buttonDir.South || this.direction == buttonDir.North)
+                {
+                    this.setEl(curvel * dirMul);
+                    Thread.Sleep(250);
+                    this.setEl(0.0);
+                }
+                else
+                {
+                    this.setAz(curvel * dirMul);
+                    Thread.Sleep(250);
+                    this.setAz(0.0);
+                }
+                state = DishState.Stopped;
+                updateStatus();
+                jogEvent.Reset();
             }
         }
         private void enableControls()
@@ -237,7 +248,7 @@ namespace DishControl
                 mainTimer.Stop();
 
             // If we're already connected, disconnect and reconnect
-           if (dev.Connected && !bSameAddress)
+            if (dev.Connected && !bSameAddress)
             {
                 enableDrive(false);
                 Thread.Sleep(1000);
@@ -277,6 +288,7 @@ namespace DishControl
                     this.setEl(0.0);
                     this.enableDrive(true);
                     mainTimer.Start();
+                    this.buttonThread.Start();
                 }
             }
             catch (Eth32Exception etherr)
@@ -437,7 +449,8 @@ namespace DishControl
                 val = polarity ? val : (val > 0 ? 0 : 1);
 
                 bit = isAz ? settings.azEnable : settings.elEnable;
-                if (bit >= 0 && bit <= 7) {
+                if (bit >= 0 && bit <= 7)
+                {
                     this.dev.OutputBit(this.outputPortNum, bit, val);
                 }
 
@@ -528,7 +541,7 @@ namespace DishControl
             currentIncrement++;
             if (currentIncrement % 99 == 0)
             {
-//                RollingLogger.LogMessage(posLog);
+                //                RollingLogger.LogMessage(posLog);
                 currentIncrement = 0;
             }
 
@@ -615,7 +628,7 @@ namespace DishControl
             }
         }
 
-        private void timer_Tick ()
+        private void timer_Tick()
         {
             WatchdoLoopcount++;
             if (WatchdoLoopcount > 49)
@@ -625,7 +638,7 @@ namespace DishControl
             {
                 this.dev.OutputBit(4, 0, bitState);
             }
-            if (WatchdoLoopcount %4 == 0) // 1/5th rate 
+            if (WatchdoLoopcount % 4 == 0) // 1/5th rate 
             {
                 updatePosition();
                 updateStatus();
@@ -640,7 +653,10 @@ namespace DishControl
                 this.enableDrive(false);
                 if (mainTimer != null)
                     mainTimer.Stop();
-               // dev is at least instantiated
+                btEnabled = false;
+                jogEvent.Set();
+
+                // dev is at least instantiated
                 if (dev.Connected)
                 {
                     dev.Disconnect();
@@ -788,33 +804,25 @@ namespace DishControl
         private void Up_Click(object sender, EventArgs e)
         {
             this.direction = buttonDir.North;
-            if (!this.buttonThread.IsAlive)
-                this.buttonThread = new Thread(this.buttonThreadHandler);
-            this.buttonThread.Start();
+            this.jogEvent.Set();
         }
 
         private void Down_Click(object sender, EventArgs e)
         {
             this.direction = buttonDir.South;
-            if (!this.buttonThread.IsAlive)
-                this.buttonThread = new Thread(this.buttonThreadHandler);
-            this.buttonThread.Start();
+            this.jogEvent.Set();
         }
 
         private void CW_Click(object sender, EventArgs e)
         {
             this.direction = buttonDir.East;
-            if (!this.buttonThread.IsAlive)
-                this.buttonThread = new Thread(this.buttonThreadHandler);
-            this.buttonThread.Start();
+            this.jogEvent.Set();
         }
 
         private void CCW_Click(object sender, EventArgs e)
         {
             this.direction = buttonDir.West;
-            if (!this.buttonThread.IsAlive)
-                this.buttonThread = new Thread(this.buttonThreadHandler);
-            this.buttonThread.Start();
+            this.jogEvent.Set();
         }
 
     }
