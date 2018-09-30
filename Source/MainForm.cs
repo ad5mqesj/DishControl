@@ -30,7 +30,7 @@ namespace DishControl
         configModel settings;
         bool appConfigured = false;
         DishState state = DishState.Unknown;
-//        HighAccuracyTimer mainTimer = null;
+        //        HighAccuracyTimer mainTimer = null;
         Thread updateThread = null;
         bool bRunTick = false;
         Encoder azEncoder = null, elEncoder = null;
@@ -146,7 +146,7 @@ namespace DishControl
                 state = DishState.Unknown;
                 azEncoder = new Encoder(this.dev, this.settings, true);
                 elEncoder = new Encoder(this.dev, this.settings, false);
-//                mainTimer = new HighAccuracyTimer(this, timer_Tick, TimerTickms);
+                //                mainTimer = new HighAccuracyTimer(this, timer_Tick, TimerTickms);
 
                 azPid = new PID(settings.azKp, settings.azKi, settings.azKd, 360.0, 0.0, settings.azOutMax, settings.azOutMin, this.azReadPosition, this.azSetpoint, this.setAz);
                 azPid.resolution = (settings.azMax - settings.azMin) / (double)((1 << settings.AzimuthEncoderBits) - 1);
@@ -406,10 +406,6 @@ namespace DishControl
                 lock (this.dev)
                 {
                     setControlBits(true, Math.Abs(azVel) < 0.05, azDir);
-                }
-                Thread.Sleep(50);
-                lock (this.dev)
-                {
                     this.dev.SetPwmParameters(settings.azPWMchan, Eth32PwmChannel.Normal, 10000.0, Math.Abs(azVel));
                 }
             }
@@ -549,18 +545,9 @@ namespace DishControl
             currentIncrement++;
             if (currentIncrement % 99 == 0)
             {
-                //                RollingLogger.LogMessage(posLog);
+                RollingLogger.LogMessage(posLog);
                 currentIncrement = 0;
             }
-
-            //while (bUpdating)
-            //{
-            //    Thread.Sleep(50);
-            //    if (azPid.Complete && elPid.Complete)
-            //    {
-            //        bUpdating = false;
-            //    }
-            //}
             this.Azimuth.Text = string.Format("{0:D3} : {1:D2}", AzAngle.Degrees, AzAngle.Minutes);
             this.Elevation.Text = string.Format("{0:D2} : {1:D2}", ElAngle.Degrees, ElAngle.Minutes);
 
@@ -634,6 +621,10 @@ namespace DishControl
                     this.Stop();
                 }
             }
+            if (TimerTickms == 1000)
+            {
+                TimerTickms = 10;
+            }
         }
 
         private delegate void TimerEventDel();
@@ -658,11 +649,10 @@ namespace DishControl
             {
                 this.dev.OutputBit(4, 0, bitState);
             }
-            if (WatchdoLoopcount % 4 == 0) // 1/5th rate 
+            if (WatchdoLoopcount % 25 == 0) // 1/5th rate 
             {
                 updatePosition();
                 updateStatus();
-
             }
         }
 
@@ -689,7 +679,7 @@ namespace DishControl
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string startingIP = settings.eth32Address;
- //           mainTimer.Stop();
+            //           mainTimer.Stop();
             Config cfgDialog = new Config(dev, this.settings);
             if (cfgDialog.ShowDialog() == DialogResult.OK)
             {
@@ -821,6 +811,8 @@ namespace DishControl
         private void MainForm_Shown(object sender, EventArgs e)
         {
             Connect();
+            updateStatus();
+            updatePosition();
         }
 
         private void Stop()
