@@ -97,6 +97,7 @@ namespace PIDLibrary
             get; set;
         }
 
+        public bool inMotion { get; set; }
         #endregion
 
         #region Construction / Deconstruction
@@ -138,7 +139,9 @@ namespace PIDLibrary
 
             runThread = new Thread(new ThreadStart(Run));
             runThread.IsBackground = true;
+            runThread.Priority = ThreadPriority.Highest;
             runThread.Name = "PID Processor";
+            inMotion = true;
             runThread.Start();
         }
 
@@ -147,6 +150,7 @@ namespace PIDLibrary
             if (runThread == null)
                 return;
 
+            inMotion = true;
             runThread.Abort();
             runThread = null;
         }
@@ -156,6 +160,7 @@ namespace PIDLibrary
             errSum = 0.0f;
             lastUpdate = DateTime.Now.Ticks;
             motionComplete = false;
+            inMotion = true;
         }
 
         #endregion

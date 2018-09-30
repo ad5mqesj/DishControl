@@ -30,7 +30,9 @@ namespace DishControl
         configModel settings;
         bool appConfigured = false;
         DishState state = DishState.Unknown;
-        HighAccuracyTimer mainTimer = null;
+//        HighAccuracyTimer mainTimer = null;
+        Thread updateThread = null;
+        bool bRunTick = false;
         Encoder azEncoder = null, elEncoder = null;
         bool trackCelestial = false;
         bool trackMoon = false;
@@ -59,6 +61,8 @@ namespace DishControl
             jogEvent = new ManualResetEvent(false);
             this.buttonThread = new Thread(buttonThreadHandler);
             this.buttonThread.Start();
+            this.updateThread = new Thread(updateThreadCallback);
+            this.updateThread.Priority = ThreadPriority.AboveNormal;
 
             if (File.Exists(configFile))
             {
@@ -142,7 +146,7 @@ namespace DishControl
                 state = DishState.Unknown;
                 azEncoder = new Encoder(this.dev, this.settings, true);
                 elEncoder = new Encoder(this.dev, this.settings, false);
-                mainTimer = new HighAccuracyTimer(this, timer_Tick, TimerTickms);
+//                mainTimer = new HighAccuracyTimer(this, timer_Tick, TimerTickms);
 
                 azPid = new PID(settings.azKp, settings.azKi, settings.azKd, 360.0, 0.0, settings.azOutMax, settings.azOutMin, this.azReadPosition, this.azSetpoint, this.setAz);
                 azPid.resolution = (settings.azMax - settings.azMin) / (double)((1 << settings.AzimuthEncoderBits) - 1);
@@ -153,9 +157,8 @@ namespace DishControl
                 azPos = settings.azPark;
                 elPos = settings.elPark;
 
-                Connect();
-                updateStatus();
-                updatePosition();
+                //updateStatus();
+                //updatePosition();
                 RollingLogger.setupRollingLogger(settings.positionFileLog, settings.maxPosLogSizeBytes, settings.maxPosLogFiles);
             }
         }
@@ -176,14 +179,16 @@ namespace DishControl
                 updateStatus();
                 if (this.direction == buttonDir.South || this.direction == buttonDir.North)
                 {
+                    Thread.Sleep(100);
                     this.setEl(curvel * dirMul);
-                    Thread.Sleep(250);
+                    Thread.Sleep(500);
                     this.setEl(0.0);
                 }
                 else
                 {
+                    Thread.Sleep(100);
                     this.setAz(curvel * dirMul);
-                    Thread.Sleep(250);
+                    Thread.Sleep(500);
                     this.setAz(0.0);
                 }
                 state = DishState.Stopped;
@@ -245,9 +250,9 @@ namespace DishControl
                 MessageBox.Show("Please configure the eht32 in Options->Settings");
                 return;
             }
-            if (mainTimer != null)
-                mainTimer.Stop();
-
+            //            if (mainTimer != null)
+            //                mainTimer.Stop();
+            bRunTick = false;
             // If we're already connected, disconnect and reconnect
             if (dev.Connected && !bSameAddress)
             {
@@ -288,7 +293,8 @@ namespace DishControl
                     this.setAz(0.0);
                     this.setEl(0.0);
                     this.enableDrive(true);
-                    mainTimer.Start();
+                    //                    mainTimer.Start();
+                    bRunTick = true;
                 }
             }
             catch (Eth32Exception etherr)
@@ -297,6 +303,7 @@ namespace DishControl
                 MessageBox.Show("Error connecting to the ETH32: " + Eth32.ErrorString(etherr.ErrorCode));
 #endif
             }
+            updateThread.Start();
         }
 
         private void connect_Click(object sender, EventArgs e)
@@ -629,12 +636,24 @@ namespace DishControl
             }
         }
 
+        private delegate void TimerEventDel();
+        private void updateThreadCallback()
+        {
+            while (btEnabled)
+            {
+                Thread.Sleep(TimerTickms);
+                if (!btEnabled)
+                    return;
+                if (bRunTick && this.IsHandleCreated)
+                    BeginInvoke(new TimerEventDel(timer_Tick));
+            }
+        }
         private void timer_Tick()
         {
             WatchdoLoopcount++;
             if (WatchdoLoopcount > 49)
                 WatchdoLoopcount = 0;
-            int bitState = (WatchdoLoopcount) % 4 > 0 ? 1 : 0; //1:5 duty cycle
+            int bitState = (WatchdoLoopcount) % 5 > 0 ? 1 : 0; //1:5 duty cycle
             lock (this.dev)
             {
                 this.dev.OutputBit(4, 0, bitState);
@@ -652,8 +671,9 @@ namespace DishControl
             if (dev != null)
             {
                 this.enableDrive(false);
-                if (mainTimer != null)
-                    mainTimer.Stop();
+                //if (mainTimer != null)
+                //    mainTimer.Stop();
+                bRunTick = false;
                 btEnabled = false;
                 jogEvent.Set();
 
@@ -669,7 +689,7 @@ namespace DishControl
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string startingIP = settings.eth32Address;
-            mainTimer.Stop();
+ //           mainTimer.Stop();
             Config cfgDialog = new Config(dev, this.settings);
             if (cfgDialog.ShowDialog() == DialogResult.OK)
             {
@@ -791,6 +811,16 @@ namespace DishControl
                 this.commandDec.Text = string.Format("{0:D2} : {1:D2}", Dec.Degrees, Dec.Minutes);
 
             }
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void MainForm_Shown(object sender, EventArgs e)
+        {
+            Connect();
         }
 
         private void Stop()

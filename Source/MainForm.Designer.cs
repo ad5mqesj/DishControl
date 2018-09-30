@@ -45,6 +45,8 @@ namespace DishControl
             this.label6 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.presetSelector = new System.Windows.Forms.ComboBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.lunarTrack = new System.Windows.Forms.Button();
             this.track = new System.Windows.Forms.CheckBox();
             this.STOP = new System.Windows.Forms.Button();
@@ -70,8 +72,6 @@ namespace DishControl
             this.CCW = new System.Windows.Forms.Button();
             this.Down = new System.Windows.Forms.Button();
             this.Message = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.presetSelector = new System.Windows.Forms.ComboBox();
             this.menuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -256,6 +256,26 @@ namespace DishControl
             this.groupBox2.TabIndex = 17;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Command Position";
+            // 
+            // presetSelector
+            // 
+            this.presetSelector.AllowDrop = true;
+            this.presetSelector.FormattingEnabled = true;
+            this.presetSelector.Location = new System.Drawing.Point(64, 69);
+            this.presetSelector.Name = "presetSelector";
+            this.presetSelector.Size = new System.Drawing.Size(191, 21);
+            this.presetSelector.TabIndex = 25;
+            this.presetSelector.SelectedIndexChanged += new System.EventHandler(this.presetSelector_SelectedIndexChanged);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(3, 69);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(55, 17);
+            this.label2.TabIndex = 24;
+            this.label2.Text = "Preset";
             // 
             // lunarTrack
             // 
@@ -507,26 +527,6 @@ namespace DishControl
             this.Message.Size = new System.Drawing.Size(0, 13);
             this.Message.TabIndex = 23;
             // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(3, 69);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(55, 17);
-            this.label2.TabIndex = 24;
-            this.label2.Text = "Preset";
-            // 
-            // presetSelector
-            // 
-            this.presetSelector.AllowDrop = true;
-            this.presetSelector.FormattingEnabled = true;
-            this.presetSelector.Location = new System.Drawing.Point(64, 69);
-            this.presetSelector.Name = "presetSelector";
-            this.presetSelector.Size = new System.Drawing.Size(191, 21);
-            this.presetSelector.TabIndex = 25;
-            this.presetSelector.SelectedIndexChanged += new System.EventHandler(this.presetSelector_SelectedIndexChanged);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -546,6 +546,8 @@ namespace DishControl
             this.Name = "MainForm";
             this.Text = "Plishner Dish";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
+            this.Load += new System.EventHandler(this.MainForm_Load);
+            this.Shown += new System.EventHandler(this.MainForm_Shown);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.groupBox1.ResumeLayout(false);
