@@ -30,7 +30,7 @@ namespace DishControl
         configModel settings;
         bool appConfigured = false;
         DishState state = DishState.Unknown;
-        //        HighAccuracyTimer mainTimer = null;
+        System.Windows.Forms.Timer mainTimer = null;
         Thread updateThread = null;
         bool bRunTick = false;
         Encoder azEncoder = null, elEncoder = null;
@@ -146,7 +146,9 @@ namespace DishControl
                 state = DishState.Unknown;
                 azEncoder = new Encoder(this.dev, this.settings, true);
                 elEncoder = new Encoder(this.dev, this.settings, false);
-                //                mainTimer = new HighAccuracyTimer(this, timer_Tick, TimerTickms);
+                mainTimer = new System.Windows.Forms.Timer();
+                mainTimer.Tick += new EventHandler(TimerEventProcessor);
+                mainTimer.Interval = 200;
 
                 azPid = new PID(settings.azKp, settings.azKi, settings.azKd, 360.0, 0.0, settings.azOutMax, settings.azOutMin, this.azReadPosition, this.azSetpoint, this.setAz);
                 azPid.resolution = (settings.azMax - settings.azMin) / (double)((1 << settings.AzimuthEncoderBits) - 1);
@@ -157,8 +159,6 @@ namespace DishControl
                 azPos = settings.azPark;
                 elPos = settings.elPark;
 
-                //updateStatus();
-                //updatePosition();
                 RollingLogger.setupRollingLogger(settings.positionFileLog, settings.maxPosLogSizeBytes, settings.maxPosLogFiles);
             }
         }
@@ -250,8 +250,8 @@ namespace DishControl
                 MessageBox.Show("Please configure the eht32 in Options->Settings");
                 return;
             }
-            //            if (mainTimer != null)
-            //                mainTimer.Stop();
+            if (mainTimer != null)
+                mainTimer.Stop();
             bRunTick = false;
             // If we're already connected, disconnect and reconnect
             if (dev.Connected && !bSameAddress)
@@ -293,7 +293,7 @@ namespace DishControl
                     this.setAz(0.0);
                     this.setEl(0.0);
                     this.enableDrive(true);
-                    //                    mainTimer.Start();
+                    mainTimer.Start();
                     bRunTick = true;
                 }
             }
@@ -543,7 +543,7 @@ namespace DishControl
 
             string posLog = string.Format("RA {0:D3} : {1:D2}\t DEC {2:D3} : {3:D2}", RA.Degrees, RA.Minutes, Dec.Degrees, Dec.Minutes);
             currentIncrement++;
-            if (currentIncrement % 99 == 0)
+            if (currentIncrement % 9 == 0)
             {
                 RollingLogger.LogMessage(posLog);
                 currentIncrement = 0;
@@ -627,6 +627,12 @@ namespace DishControl
             }
         }
 
+        private void TimerEventProcessor(Object myObject, EventArgs myEventArgs)
+        {
+            updatePosition();
+            updateStatus();
+        }
+
         private delegate void TimerEventDel();
         private void updateThreadCallback()
         {
@@ -649,11 +655,11 @@ namespace DishControl
             {
                 this.dev.OutputBit(4, 0, bitState);
             }
-            if (WatchdoLoopcount % 25 == 0) // 1/5th rate 
-            {
-                updatePosition();
-                updateStatus();
-            }
+            //if (WatchdoLoopcount % 25 == 0) // 1/5th rate 
+            //{
+            //    updatePosition();
+            //    updateStatus();
+            //}
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -661,8 +667,8 @@ namespace DishControl
             if (dev != null)
             {
                 this.enableDrive(false);
-                //if (mainTimer != null)
-                //    mainTimer.Stop();
+                if (mainTimer != null)
+                    mainTimer.Stop();
                 bRunTick = false;
                 btEnabled = false;
                 jogEvent.Set();
@@ -679,7 +685,7 @@ namespace DishControl
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string startingIP = settings.eth32Address;
-            //           mainTimer.Stop();
+            mainTimer.Stop();
             Config cfgDialog = new Config(dev, this.settings);
             if (cfgDialog.ShowDialog() == DialogResult.OK)
             {
