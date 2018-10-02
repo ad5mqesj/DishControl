@@ -53,8 +53,6 @@ namespace DishControl
             jogEvent = new ManualResetEvent(false);
             this.buttonThread = new Thread(buttonThreadHandler);
             this.buttonThread.Start();
-            this.updateThread = new Thread(updateThreadCallback);
-            this.updateThread.Priority = ThreadPriority.AboveNormal;
 
             //try to read config file - open config dialog if not found
             string configFile = Application.StartupPath + "\\dishConfig.xml";
@@ -189,110 +187,31 @@ namespace DishControl
                 this.Connect();
         }
 
-       private void setControlBits(bool isAz, bool stopped, bool dirCW)
-        {
-            int val = 0;
-            int bit = 0;
-
-            bool polarity = isAz ? settings.azActiveHi : settings.elActiveHi;
-            val = polarity ? val : (val > 0 ? 0 : 1);
-
-
-            if (stopped) //turn all bits "off"
-            {
-                val = 0;
-                polarity = isAz ? settings.azActiveHi : settings.elActiveHi;
-                val = polarity ? val : (val > 0 ? 0 : 1);
-
-                bit = isAz ? settings.azEnable : settings.elEnable;
-                if (bit >= 0 && bit <= 7)
-                {
-                    this.dev.OutputBit(this.outputPortNum, bit, val);
-                }
-
-                bit = isAz ? settings.azCCWbit : settings.elCCWbit;
-                this.dev.OutputBit(this.outputPortNum, bit, val);
-
-                bit = isAz ? settings.azCWbit : settings.elCWbit;
-                this.dev.OutputBit(this.outputPortNum, bit, val);
-                //don't subsequently turn things on when not driving 
-                return;
-            }
-
-            driveType mode = isAz ? settings.azDriveType : settings.elDriveType;
-            switch (mode)
-            {
-                case driveType.Both:
-                    //CW
-                    bit = isAz ? settings.azCWbit : settings.elCWbit;
-                    val = dirCW ? 1 : 0;
-                    val = polarity ? val : (val > 0 ? 0 : 1);
-                    this.dev.OutputBit(this.outputPortNum, bit, val);
-
-                    //CCW
-                    bit = isAz ? settings.azCCWbit : settings.elCCWbit;
-                    //polarity ALWAYS opposite of CW bit
-                    val = val > 0 ? 0 : 1;
-                    this.dev.OutputBit(this.outputPortNum, bit, val);
-
-                    //enable
-                    bit = isAz ? settings.azEnable : settings.elEnable;
-                    val = stopped ? 0 : 1;
-                    val = polarity ? val : (val > 0 ? 0 : 1);
-                    if (bit >= 0 && bit <= 7)
-                    {
-                        this.dev.OutputBit(this.outputPortNum, bit, val);
-                    }
-                    break;
-
-                case driveType.CCW:
-                    //CW
-                    bit = isAz ? settings.azCWbit : settings.elCWbit;
-                    val = dirCW ? 1 : 0;
-                    val = polarity ? val : (val > 0 ? 0 : 1);
-                    this.dev.OutputBit(this.outputPortNum, bit, val);
-                    //CCW
-                    bit = isAz ? settings.azCCWbit : settings.elCCWbit;
-                    //polarity ALWAYS opposite of CW bit
-                    val = val > 0 ? 0 : 1;
-                    this.dev.OutputBit(this.outputPortNum, bit, val);
-                    break;
-
-                case driveType.DirEnable:
-                    //direction
-                    bit = isAz ? settings.azCWbit : settings.elCWbit;
-                    val = dirCW ? 1 : 0;
-                    val = polarity ? val : (val > 0 ? 0 : 1);
-                    this.dev.OutputBit(this.outputPortNum, bit, val);
-                    //enable
-                    bit = isAz ? settings.azEnable : settings.elEnable;
-                    val = stopped ? 0 : 1;
-                    val = polarity ? val : (val > 0 ? 0 : 1);
-                    this.dev.OutputBit(this.outputPortNum, bit, val);
-                    break;
-            }
-
-        }
-
+        //update position display
         private void updatePosition()
         {
             if ((DateTime.Now - messageTime).TotalSeconds > 30)
             {
                 Message.Text = "";
             }
+
+            //read actual form encoders
             if (dev.Connected && state == DishState.Stopped)
             {
-                azPos = azEncoder.countsToDegrees(azEncoder.readNormalizedEncoderBits());
-                elPos = elEncoder.countsToDegrees(elEncoder.readNormalizedEncoderBits());
+                azPos = azReadPosition();
+                elPos = elReadPosition();
             }
-
+            //set up display variables in deg, min, sec format
             GeoAngle AzAngle = GeoAngle.FromDouble(azPos, true);
             GeoAngle ElAngle = GeoAngle.FromDouble(elPos);
-
+            
+            //convert to RA/DEC
             RaDec astro = celestialConversion.CalcualteRaDec(elPos, azPos, settings.latitude, settings.longitude);
+            //set up RA DEC as deg,min,sec
             GeoAngle Dec = GeoAngle.FromDouble(astro.Dec);
             GeoAngle RA = GeoAngle.FromDouble(astro.RA, true);
-
+            
+            //log position every tenth time through
             string posLog = string.Format("RA {0:D3} : {1:D2}\t DEC {2:D3} : {3:D2}", RA.Degrees, RA.Minutes, Dec.Degrees, Dec.Minutes);
             currentIncrement++;
             if (currentIncrement % 9 == 0)
@@ -300,9 +219,12 @@ namespace DishControl
                 RollingLogger.LogMessage(posLog);
                 currentIncrement = 0;
             }
+
+            //show AZ, EL on main form
             this.Azimuth.Text = string.Format("{0:D3} : {1:D2}", AzAngle.Degrees, AzAngle.Minutes);
             this.Elevation.Text = string.Format("{0:D2} : {1:D2}", ElAngle.Degrees, ElAngle.Minutes);
-
+            
+            //first time through set az, el command to current pos
             if (azCommand == -1.0)
             {
                 this.commandAz.Text = this.Azimuth.Text;
@@ -311,10 +233,13 @@ namespace DishControl
                 elCommand = elPos;
             }
 
-
+            //show RA,DEC on main form
             this.RA.Text = string.Format("{0:D3} : {1:D2}", RA.Degrees, RA.Minutes);
             this.DEC.Text = string.Format("{0:D2} : {1:D2}", Dec.Degrees, Dec.Minutes);
 
+            //if celestial track is set, check to make sure command position is above horizon if so then enable motion
+            //probably have to have a completely seperate velocity track loop here - PID loop may not be satisfactor
+            //-----NEEDS TESTING
             if (trackCelestial)
             {
                 AltAz aa = celestialConversion.CalculateAltAz(RAcommand, decCommand, settings.latitude, settings.longitude);
@@ -335,6 +260,11 @@ namespace DishControl
                 if (state != DishState.Moving && state != DishState.Tracking && aa.Alt > 1.0)
                     this.Go();
             }
+
+
+            //if Lunar track is set, check to make sure Moon position is above horizon if so then enable motion
+            //probably have to have a completely seperate velocity track loop here - PID loop may not be satisfactor
+            //-----NEEDS TESTING
             if (trackMoon)
             {
                 SunCalc sc = new SunCalc();
@@ -366,6 +296,8 @@ namespace DishControl
                 if (state != DishState.Moving && state != DishState.Tracking && aa.Alt > 1.0)
                     this.Go();
             }//trackMoon
+
+            //send stop command if we have to here
             if (state != DishState.Stopped && state != DishState.Unknown)
             {
                 if (azPid.Complete && elPid.Complete)
@@ -373,46 +305,15 @@ namespace DishControl
                     this.Stop();
                 }
             }
-            if (TimerTickms == 1000)
-            {
-                TimerTickms = 10;
-            }
         }
 
+        //this is the sloppy Forms timer that controls UI update
         private void TimerEventProcessor(Object myObject, EventArgs myEventArgs)
         {
             updatePosition();
             updateStatus();
         }
 
-        private delegate void TimerEventDel();
-        private void updateThreadCallback()
-        {
-            while (btEnabled)
-            {
-                Thread.Sleep(TimerTickms);
-                if (!btEnabled)
-                    return;
-                if (bRunTick && this.IsHandleCreated)
-                    BeginInvoke(new TimerEventDel(timer_Tick));
-            }
-        }
-        private void timer_Tick()
-        {
-            WatchdoLoopcount++;
-            if (WatchdoLoopcount > 49)
-                WatchdoLoopcount = 0;
-            int bitState = (WatchdoLoopcount) % 5 > 0 ? 1 : 0; //1:5 duty cycle
-            lock (this.dev)
-            {
-                this.dev.OutputBit(4, 0, bitState);
-            }
-            //if (WatchdoLoopcount % 25 == 0) // 1/5th rate 
-            //{
-            //    updatePosition();
-            //    updateStatus();
-            //}
-        }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
