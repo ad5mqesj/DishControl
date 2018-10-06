@@ -172,6 +172,10 @@
             this.label39 = new System.Windows.Forms.Label();
             this.PS1Name = new System.Windows.Forms.TextBox();
             this.label38 = new System.Windows.Forms.Label();
+            this.SouthParkPosAz = new System.Windows.Forms.TextBox();
+            this.label53 = new System.Windows.Forms.Label();
+            this.SouthParkPosEl = new System.Windows.Forms.TextBox();
+            this.label54 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -634,6 +638,8 @@
             // 
             // groupBox6
             // 
+            this.groupBox6.Controls.Add(this.SouthParkPosEl);
+            this.groupBox6.Controls.Add(this.label54);
             this.groupBox6.Controls.Add(this.elEnBit);
             this.groupBox6.Controls.Add(this.elCBactiveHi);
             this.groupBox6.Controls.Add(this.elCB3);
@@ -932,6 +938,8 @@
             // 
             // groupBox5
             // 
+            this.groupBox5.Controls.Add(this.SouthParkPosAz);
+            this.groupBox5.Controls.Add(this.label53);
             this.groupBox5.Controls.Add(this.azEnBit);
             this.groupBox5.Controls.Add(this.azCB3);
             this.groupBox5.Controls.Add(this.azCBactiveHi);
@@ -1613,6 +1621,40 @@
             this.label38.TabIndex = 27;
             this.label38.Text = "Preset 1 Name";
             // 
+            // SouthParkPosAz
+            // 
+            this.SouthParkPosAz.Location = new System.Drawing.Point(495, 115);
+            this.SouthParkPosAz.Name = "SouthParkPosAz";
+            this.SouthParkPosAz.Size = new System.Drawing.Size(59, 20);
+            this.SouthParkPosAz.TabIndex = 32;
+            this.SouthParkPosAz.TextChanged += new System.EventHandler(this.SouthParkPosAz_TextChanged);
+            // 
+            // label53
+            // 
+            this.label53.AutoSize = true;
+            this.label53.Location = new System.Drawing.Point(413, 118);
+            this.label53.Name = "label53";
+            this.label53.Size = new System.Drawing.Size(81, 13);
+            this.label53.TabIndex = 31;
+            this.label53.Text = "South Park Pos";
+            // 
+            // SouthParkPosEl
+            // 
+            this.SouthParkPosEl.Location = new System.Drawing.Point(495, 112);
+            this.SouthParkPosEl.Name = "SouthParkPosEl";
+            this.SouthParkPosEl.Size = new System.Drawing.Size(59, 20);
+            this.SouthParkPosEl.TabIndex = 34;
+            this.SouthParkPosEl.TextChanged += new System.EventHandler(this.SouthParkPosEl_TextChanged);
+            // 
+            // label54
+            // 
+            this.label54.AutoSize = true;
+            this.label54.Location = new System.Drawing.Point(413, 115);
+            this.label54.Name = "label54";
+            this.label54.Size = new System.Drawing.Size(81, 13);
+            this.label54.TabIndex = 33;
+            this.label54.Text = "South Park Pos";
+            // 
             // Config
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1796,5 +1838,9 @@
         private System.Windows.Forms.Label label39;
         private System.Windows.Forms.TextBox PS1Name;
         private System.Windows.Forms.Label label38;
+        private System.Windows.Forms.TextBox SouthParkPosEl;
+        private System.Windows.Forms.Label label54;
+        private System.Windows.Forms.TextBox SouthParkPosAz;
+        private System.Windows.Forms.Label label53;
     }
 }

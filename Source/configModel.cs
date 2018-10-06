@@ -96,6 +96,7 @@ namespace DishControl
             azOutMax = 16384.0;
             azOutMin = 0.0;
             azPark = 0.0;
+            azSouthPark = 180.0;
             elDriveType = driveType.Both;
             elActiveHi = true;
             elCWbit = 2;
@@ -110,6 +111,7 @@ namespace DishControl
             elOutMax = 16384.0;
             elOutMin = 0.0;
             elPark = 89.99;
+            elSouthPark = 89.99;
 
             positionFileLog = "c:\\PositionLogs\\Position.log";
             maxPosLogFiles = 5;
@@ -208,6 +210,7 @@ namespace DishControl
         public double azOutMin { get; set; }
 
         public double azPark { get; set; }
+        public double azSouthPark { get; set; }
 
         public driveType elDriveType { get; set; }
         public bool elActiveHi { get; set; }
@@ -224,6 +227,7 @@ namespace DishControl
         public double elOutMax { get; set; }
         public double elOutMin { get; set; }
         public double elPark { get; set; }
+        public double elSouthPark { get; set; }
 
         public string positionFileLog { get; set; }
         public int maxPosLogSizeBytes { get; set; }

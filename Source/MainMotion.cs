@@ -120,6 +120,11 @@ namespace DishControl
                 MessageBox.Show("Error connecting to the ETH32: " + Eth32.ErrorString(etherr.ErrorCode));
 #endif
             }
+            if (!updateThread.IsAlive)
+            {
+                this.updateThread = new Thread(updateThreadCallback);
+                this.updateThread.Priority = ThreadPriority.Highest;
+            }
             updateThread.Start();
         }
 

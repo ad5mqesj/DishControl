@@ -338,7 +338,9 @@ namespace DishControl
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string startingIP = settings.eth32Address;
+            this.Stop();
             mainTimer.Stop();
+            updateThread.Abort();
             Config cfgDialog = new Config(dev, this.settings);
             if (cfgDialog.ShowDialog() == DialogResult.OK)
             {
@@ -507,5 +509,26 @@ namespace DishControl
             this.jogEvent.Set();
         }
 
+        private void SouthPark_Click(object sender, EventArgs e)
+        {
+            azCommand = settings.azSouthPark;
+            elCommand = settings.elSouthPark;
+            GeoAngle mAzAngle = GeoAngle.FromDouble(azCommand, true);
+            GeoAngle mElAngle = GeoAngle.FromDouble(elCommand);
+            this.commandAz.Text = string.Format("{0} : {1}", mAzAngle.Degrees, mAzAngle.Minutes);
+            this.commandEl.Text = string.Format("{0} : {1}", mElAngle.Degrees, mElAngle.Minutes);
+
+            RaDec astro = celestialConversion.CalcualteRaDec(mElAngle.ToDouble(), mAzAngle.ToDouble(), settings.latitude, settings.longitude);
+            GeoAngle Dec = GeoAngle.FromDouble(astro.Dec);
+            GeoAngle RA = GeoAngle.FromDouble(astro.RA, true);
+
+            this.commandRA.Text = string.Format("{0:D3} : {1:D2}", RA.Degrees, RA.Minutes);
+            this.commandDec.Text = string.Format("{0:D2} : {1:D2}", Dec.Degrees, Dec.Minutes);
+
+            this.state = DishState.Parking; ;
+
+            azPid.Enable();
+            elPid.Enable();
+        }
     }
 }

@@ -86,6 +86,7 @@ namespace DishControl
                 this.azOutMax.Text = settings.azOutMax.ToString();
                 this.azOutMin.Text = settings.azOutMin.ToString();
                 this.azPark.Text = settings.azPark.ToString();
+                this.SouthParkPosAz.Text = settings.azSouthPark.ToString();
 
                 this.elCBactiveHi.Checked = settings.elActiveHi;
                 this.elCW_CCW.Checked = settings.elDriveType == driveType.CCW;
@@ -124,6 +125,7 @@ namespace DishControl
                 this.elOutMax.Text = settings.elOutMax.ToString();
                 this.elOutMin.Text = settings.elOutMin.ToString();
                 this.elPark.Text = settings.elPark.ToString();
+                this.SouthParkPosEl.Text = settings.elSouthPark.ToString();
 
                 this.PosLogFile.Text = settings.positionFileLog;
                 this.maxPosLogSize.Text = settings.maxPosLogSizeBytes.ToString();
@@ -799,6 +801,20 @@ namespace DishControl
             double d;
             double.TryParse(this.PS5El.Text, out d);
             settings.Preset5El = d;
+        }
+
+        private void SouthParkPosEl_TextChanged(object sender, EventArgs e)
+        {
+            double d;
+            double.TryParse(this.SouthParkPosEl.Text, out d);
+            settings.elSouthPark = d;
+        }
+
+        private void SouthParkPosAz_TextChanged(object sender, EventArgs e)
+        {
+            double d;
+            double.TryParse(this.SouthParkPosAz.Text, out d);
+            settings.azSouthPark = d;
         }
     }
 }

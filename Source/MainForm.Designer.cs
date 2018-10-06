@@ -72,6 +72,7 @@ namespace DishControl
             this.CCW = new System.Windows.Forms.Button();
             this.Down = new System.Windows.Forms.Button();
             this.Message = new System.Windows.Forms.Label();
+            this.SouthPark = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -235,6 +236,7 @@ namespace DishControl
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.SouthPark);
             this.groupBox2.Controls.Add(this.presetSelector);
             this.groupBox2.Controls.Add(this.label2);
             this.groupBox2.Controls.Add(this.lunarTrack);
@@ -279,7 +281,7 @@ namespace DishControl
             // 
             // lunarTrack
             // 
-            this.lunarTrack.Location = new System.Drawing.Point(164, 149);
+            this.lunarTrack.Location = new System.Drawing.Point(156, 149);
             this.lunarTrack.Name = "lunarTrack";
             this.lunarTrack.Size = new System.Drawing.Size(75, 23);
             this.lunarTrack.TabIndex = 23;
@@ -311,11 +313,11 @@ namespace DishControl
             // 
             // Park
             // 
-            this.Park.Location = new System.Drawing.Point(164, 178);
+            this.Park.Location = new System.Drawing.Point(210, 178);
             this.Park.Name = "Park";
             this.Park.Size = new System.Drawing.Size(75, 23);
             this.Park.TabIndex = 20;
-            this.Park.Text = "Park";
+            this.Park.Text = "Maint. Park";
             this.Park.UseVisualStyleBackColor = true;
             this.Park.Click += new System.EventHandler(this.Park_Click);
             // 
@@ -527,6 +529,16 @@ namespace DishControl
             this.Message.Size = new System.Drawing.Size(0, 13);
             this.Message.TabIndex = 23;
             // 
+            // SouthPark
+            // 
+            this.SouthPark.Location = new System.Drawing.Point(98, 178);
+            this.SouthPark.Name = "SouthPark";
+            this.SouthPark.Size = new System.Drawing.Size(75, 23);
+            this.SouthPark.TabIndex = 26;
+            this.SouthPark.Text = "South Park";
+            this.SouthPark.UseVisualStyleBackColor = true;
+            this.SouthPark.Click += new System.EventHandler(this.SouthPark_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -608,6 +620,7 @@ namespace DishControl
         private System.Windows.Forms.ToolStripMenuItem driveTestToolStripMenuItem;
         private System.Windows.Forms.ComboBox presetSelector;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Button SouthPark;
     }
 }
 
