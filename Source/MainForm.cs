@@ -528,11 +528,12 @@ namespace DishControl
             {
                 Message.Text = "";
             }
-            if (dev.Connected && state == DishState.Stopped)
-            {
-                azPos = azEncoder.countsToDegrees(azEncoder.readNormalizedEncoderBits());
-                elPos = elEncoder.countsToDegrees(elEncoder.readNormalizedEncoderBits());
-            }
+
+            //if (dev.Connected && state == DishState.Stopped)
+            //{
+            //    azPos = azEncoder.countsToDegrees(azEncoder.readNormalizedEncoderBits());
+            //    elPos = elEncoder.countsToDegrees(elEncoder.readNormalizedEncoderBits());
+            //}
 
             GeoAngle AzAngle = GeoAngle.FromDouble(azPos, true);
             GeoAngle ElAngle = GeoAngle.FromDouble(elPos);
@@ -604,7 +605,7 @@ namespace DishControl
                 this.commandEl.Text = string.Format("{2}{0} : {1}", mElAngle.Degrees, mElAngle.Minutes, mElAngle.IsNegative ? "-" : "");
 
                 double Alt = elCommand;
-                if (Alt > 90.0) Alt = Alt - 90.0;
+                if (Alt > 180.0) Alt = Alt - 180.0;
                 RaDec mastro = celestialConversion.CalcualteRaDec(Alt, azCommand, settings.latitude, settings.longitude);
                 GeoAngle mDec = GeoAngle.FromDouble(mastro.Dec);
                 GeoAngle mRA = GeoAngle.FromDouble(mastro.RA, true);
@@ -620,10 +621,6 @@ namespace DishControl
                 {
                     this.Stop();
                 }
-            }
-            if (TimerTickms == 1000)
-            {
-                TimerTickms = 10;
             }
         }
 
@@ -648,18 +645,23 @@ namespace DishControl
         private void timer_Tick()
         {
             WatchdoLoopcount++;
-            if (WatchdoLoopcount > 49)
+            if (WatchdoLoopcount > 50)
                 WatchdoLoopcount = 0;
             int bitState = (WatchdoLoopcount) % 5 > 0 ? 1 : 0; //1:5 duty cycle
             lock (this.dev)
             {
                 this.dev.OutputBit(4, 0, bitState);
             }
-            //if (WatchdoLoopcount % 25 == 0) // 1/5th rate 
-            //{
-            //    updatePosition();
-            //    updateStatus();
-            //}
+            if (WatchdoLoopcount % 10 == 0) // 1/5th rate 
+            {
+                if (dev.Connected && state == DishState.Stopped)
+                {
+                    azPos = azEncoder.countsToDegrees(azEncoder.readNormalizedEncoderBits());
+                    elPos = elEncoder.countsToDegrees(elEncoder.readNormalizedEncoderBits());
+                }
+                //    updatePosition();
+                //    updateStatus();
+            }
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
