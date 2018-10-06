@@ -120,6 +120,60 @@ namespace DishControl
             Preset5El = Preset4El = Preset3El = Preset2El = Preset1El = 0.0;
         }
 
+        public List<presets> getPresetList()
+        {
+            List<presets> Presets = new List<presets>();
+            presets none = new presets()
+            {
+                Value = 0,
+                Text = "None",
+                Az = 0.0,
+                El = 0.0
+            };
+            Presets.Add(none);
+            presets ps1 = new presets()
+            {
+                Value = 1,
+                Text = this.Preset1Name,
+                Az = this.Preset1Az,
+                El = this.Preset1El
+            };
+            Presets.Add(ps1);
+            presets ps2 = new presets()
+            {
+                Value = 2,
+                Text = this.Preset2Name,
+                Az = this.Preset2Az,
+                El = this.Preset2El
+            };
+            Presets.Add(ps2);
+            presets ps3 = new presets()
+            {
+                Value = 3,
+                Text = this.Preset3Name,
+                Az = this.Preset3Az,
+                El = this.Preset3El
+            };
+            Presets.Add(ps3);
+            presets ps4 = new presets()
+            {
+                Value = 4,
+                Text = this.Preset4Name,
+                Az = this.Preset4Az,
+                El = this.Preset4El
+            };
+            Presets.Add(ps4);
+            presets ps5 = new presets()
+            {
+                Value = 5,
+                Text = this.Preset5Name,
+                Az = this.Preset5Az,
+                El = this.Preset5El
+            };
+            Presets.Add(ps5);
+            return Presets;
+        }
+
         public double latitude { get; set; }
         public double longitude { get; set; }
         public double altitude { get; set; }
