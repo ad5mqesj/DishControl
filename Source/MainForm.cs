@@ -91,7 +91,6 @@ namespace DishControl
 
                 RollingLogger.setupRollingLogger(settings.positionFileLog, settings.maxPosLogSizeBytes, settings.maxPosLogFiles);
 
-                MotionSetup();
             }//if config exists
         }
 
@@ -224,15 +223,6 @@ namespace DishControl
             this.Azimuth.Text = string.Format("{0:D3} : {1:D2}", AzAngle.Degrees, AzAngle.Minutes);
             this.Elevation.Text = string.Format("{0:D2} : {1:D2}", ElAngle.Degrees, ElAngle.Minutes);
             
-            //first time through set az, el command to current pos
-            if (azCommand == -1.0)
-            {
-                this.commandAz.Text = this.Azimuth.Text;
-                this.commandEl.Text = this.Elevation.Text;
-                azCommand = azPos;
-                elCommand = elPos;
-            }
-
             //show RA,DEC on main form
             this.RA.Text = string.Format("{0:D3} : {1:D2}", RA.Degrees, RA.Minutes);
             this.DEC.Text = string.Format("{0:D2} : {1:D2}", Dec.Degrees, Dec.Minutes);

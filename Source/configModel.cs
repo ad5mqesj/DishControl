@@ -91,6 +91,7 @@ namespace DishControl
             azKp = 1.0;
             azKi = 0.0;
             azKd = 0.0;
+            azG = 1.0;
             azMax = 370.0;
             azMin = -10.0;
             azOutMax = 16384.0;
@@ -106,6 +107,7 @@ namespace DishControl
             elKp = 1.0;
             elKi = 0.0;
             elKd = 0.0;
+            elG = 1.0;
             elMax = 90.0;
             elMin = 0.0;
             elOutMax = 16384.0;
@@ -204,6 +206,7 @@ namespace DishControl
         public double azKp { get; set; }
         public double azKi { get; set; }
         public double azKd { get; set; }
+        public double azG { get; set; }
         public double azMax { get; set; }
         public double azMin { get; set; }
         public double azOutMax { get; set; }
@@ -222,6 +225,7 @@ namespace DishControl
         public double elKp { get; set; }
         public double elKi { get; set; }
         public double elKd { get; set; }
+        public double elG { get; set; }
         public double elMax { get; set; }
         public double elMin { get; set; }
         public double elOutMax { get; set; }

@@ -73,6 +73,8 @@
             this.jogIncrement = new System.Windows.Forms.TextBox();
             this.label36 = new System.Windows.Forms.Label();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.SouthParkPosEl = new System.Windows.Forms.TextBox();
+            this.label54 = new System.Windows.Forms.Label();
             this.elEnBit = new System.Windows.Forms.TextBox();
             this.elCBactiveHi = new System.Windows.Forms.CheckBox();
             this.elCB3 = new System.Windows.Forms.Label();
@@ -103,6 +105,8 @@
             this.elCWbit = new System.Windows.Forms.TextBox();
             this.elCB1 = new System.Windows.Forms.Label();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.SouthParkPosAz = new System.Windows.Forms.TextBox();
+            this.label53 = new System.Windows.Forms.Label();
             this.azEnBit = new System.Windows.Forms.TextBox();
             this.azCB3 = new System.Windows.Forms.Label();
             this.azCBactiveHi = new System.Windows.Forms.CheckBox();
@@ -172,10 +176,8 @@
             this.label39 = new System.Windows.Forms.Label();
             this.PS1Name = new System.Windows.Forms.TextBox();
             this.label38 = new System.Windows.Forms.Label();
-            this.SouthParkPosAz = new System.Windows.Forms.TextBox();
-            this.label53 = new System.Windows.Forms.Label();
-            this.SouthParkPosEl = new System.Windows.Forms.TextBox();
-            this.label54 = new System.Windows.Forms.Label();
+            this.Gain = new System.Windows.Forms.TextBox();
+            this.label55 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -587,6 +589,8 @@
             // tabPage2
             // 
             this.tabPage2.BackColor = System.Drawing.Color.LightSteelBlue;
+            this.tabPage2.Controls.Add(this.Gain);
+            this.tabPage2.Controls.Add(this.label55);
             this.tabPage2.Controls.Add(this.driveEnableBit);
             this.tabPage2.Controls.Add(this.label15);
             this.tabPage2.Controls.Add(this.jogIncrement);
@@ -604,7 +608,7 @@
             // 
             // driveEnableBit
             // 
-            this.driveEnableBit.Location = new System.Drawing.Point(500, 20);
+            this.driveEnableBit.Location = new System.Drawing.Point(420, 20);
             this.driveEnableBit.Name = "driveEnableBit";
             this.driveEnableBit.Size = new System.Drawing.Size(59, 20);
             this.driveEnableBit.TabIndex = 26;
@@ -613,7 +617,7 @@
             // label15
             // 
             this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(411, 23);
+            this.label15.Location = new System.Drawing.Point(331, 23);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(83, 13);
             this.label15.TabIndex = 25;
@@ -621,7 +625,7 @@
             // 
             // jogIncrement
             // 
-            this.jogIncrement.Location = new System.Drawing.Point(327, 20);
+            this.jogIncrement.Location = new System.Drawing.Point(266, 20);
             this.jogIncrement.Name = "jogIncrement";
             this.jogIncrement.Size = new System.Drawing.Size(59, 20);
             this.jogIncrement.TabIndex = 24;
@@ -630,11 +634,11 @@
             // label36
             // 
             this.label36.AutoSize = true;
-            this.label36.Location = new System.Drawing.Point(247, 23);
+            this.label36.Location = new System.Drawing.Point(213, 24);
             this.label36.Name = "label36";
-            this.label36.Size = new System.Drawing.Size(74, 13);
+            this.label36.Size = new System.Drawing.Size(47, 13);
             this.label36.TabIndex = 9;
-            this.label36.Text = "Jog Increment";
+            this.label36.Text = "Jog cmd";
             // 
             // groupBox6
             // 
@@ -672,6 +676,23 @@
             this.groupBox6.TabIndex = 8;
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = "Elevation";
+            // 
+            // SouthParkPosEl
+            // 
+            this.SouthParkPosEl.Location = new System.Drawing.Point(495, 112);
+            this.SouthParkPosEl.Name = "SouthParkPosEl";
+            this.SouthParkPosEl.Size = new System.Drawing.Size(59, 20);
+            this.SouthParkPosEl.TabIndex = 34;
+            this.SouthParkPosEl.TextChanged += new System.EventHandler(this.SouthParkPosEl_TextChanged);
+            // 
+            // label54
+            // 
+            this.label54.AutoSize = true;
+            this.label54.Location = new System.Drawing.Point(413, 115);
+            this.label54.Name = "label54";
+            this.label54.Size = new System.Drawing.Size(81, 13);
+            this.label54.TabIndex = 33;
+            this.label54.Text = "South Park Pos";
             // 
             // elEnBit
             // 
@@ -973,6 +994,23 @@
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Azimuth";
             // 
+            // SouthParkPosAz
+            // 
+            this.SouthParkPosAz.Location = new System.Drawing.Point(495, 115);
+            this.SouthParkPosAz.Name = "SouthParkPosAz";
+            this.SouthParkPosAz.Size = new System.Drawing.Size(59, 20);
+            this.SouthParkPosAz.TabIndex = 32;
+            this.SouthParkPosAz.TextChanged += new System.EventHandler(this.SouthParkPosAz_TextChanged);
+            // 
+            // label53
+            // 
+            this.label53.AutoSize = true;
+            this.label53.Location = new System.Drawing.Point(413, 118);
+            this.label53.Name = "label53";
+            this.label53.Size = new System.Drawing.Size(81, 13);
+            this.label53.TabIndex = 31;
+            this.label53.Text = "South Park Pos";
+            // 
             // azEnBit
             // 
             this.azEnBit.Location = new System.Drawing.Point(88, 73);
@@ -1244,7 +1282,7 @@
             "P1",
             "P2",
             "P3"});
-            this.outputPort.Location = new System.Drawing.Point(84, 20);
+            this.outputPort.Location = new System.Drawing.Point(80, 20);
             this.outputPort.Name = "outputPort";
             this.outputPort.Size = new System.Drawing.Size(121, 21);
             this.outputPort.TabIndex = 1;
@@ -1621,39 +1659,22 @@
             this.label38.TabIndex = 27;
             this.label38.Text = "Preset 1 Name";
             // 
-            // SouthParkPosAz
+            // Gain
             // 
-            this.SouthParkPosAz.Location = new System.Drawing.Point(495, 115);
-            this.SouthParkPosAz.Name = "SouthParkPosAz";
-            this.SouthParkPosAz.Size = new System.Drawing.Size(59, 20);
-            this.SouthParkPosAz.TabIndex = 32;
-            this.SouthParkPosAz.TextChanged += new System.EventHandler(this.SouthParkPosAz_TextChanged);
+            this.Gain.Location = new System.Drawing.Point(515, 20);
+            this.Gain.Name = "Gain";
+            this.Gain.Size = new System.Drawing.Size(59, 20);
+            this.Gain.TabIndex = 28;
+            this.Gain.TextChanged += new System.EventHandler(this.Gain_TextChanged);
             // 
-            // label53
+            // label55
             // 
-            this.label53.AutoSize = true;
-            this.label53.Location = new System.Drawing.Point(413, 118);
-            this.label53.Name = "label53";
-            this.label53.Size = new System.Drawing.Size(81, 13);
-            this.label53.TabIndex = 31;
-            this.label53.Text = "South Park Pos";
-            // 
-            // SouthParkPosEl
-            // 
-            this.SouthParkPosEl.Location = new System.Drawing.Point(495, 112);
-            this.SouthParkPosEl.Name = "SouthParkPosEl";
-            this.SouthParkPosEl.Size = new System.Drawing.Size(59, 20);
-            this.SouthParkPosEl.TabIndex = 34;
-            this.SouthParkPosEl.TextChanged += new System.EventHandler(this.SouthParkPosEl_TextChanged);
-            // 
-            // label54
-            // 
-            this.label54.AutoSize = true;
-            this.label54.Location = new System.Drawing.Point(413, 115);
-            this.label54.Name = "label54";
-            this.label54.Size = new System.Drawing.Size(81, 13);
-            this.label54.TabIndex = 33;
-            this.label54.Text = "South Park Pos";
+            this.label55.AutoSize = true;
+            this.label55.Location = new System.Drawing.Point(485, 24);
+            this.label55.Name = "label55";
+            this.label55.Size = new System.Drawing.Size(29, 13);
+            this.label55.TabIndex = 27;
+            this.label55.Text = "Gain";
             // 
             // Config
             // 
@@ -1842,5 +1863,7 @@
         private System.Windows.Forms.Label label54;
         private System.Windows.Forms.TextBox SouthParkPosAz;
         private System.Windows.Forms.Label label53;
+        private System.Windows.Forms.TextBox Gain;
+        private System.Windows.Forms.Label label55;
     }
 }

@@ -14,6 +14,8 @@ namespace PIDLibrary
         private double ki;
         private double kd;
 
+        private double gain;
+
         //Running Values
         //private DateTime lastUpdate;
         private long lastUpdate = 0;
@@ -56,6 +58,12 @@ namespace PIDLibrary
         {
             get { return kd; }
             set { kd = value; }
+        }
+
+        public double Gain
+        {
+            get { return gain; }
+            set { gain = value; }
         }
 
         public double PVMin
@@ -102,13 +110,14 @@ namespace PIDLibrary
 
         #region Construction / Deconstruction
 
-        public PID(double pG, double iG, double dG,
+        public PID(double pG, double iG, double dG, double g,
             double pMax, double pMin, double oMax, double oMin,
             GetDouble pvFunc, GetDouble spFunc, SetDouble outFunc)
         {
             kp = pG;
             ki = iG;
             kd = dG;
+            gain = g;
             pvMax = pMax;
             pvMin = pMin;
             outMax = oMax;
@@ -240,7 +249,7 @@ namespace PIDLibrary
             lastPV = pv;
 
             //Now we have to scale the output value to match the requested scale
-            double outReal = pTerm + iTerm + dTerm;
+            double outReal = (pTerm + iTerm + dTerm)*gain;
 
             //outReal = Clamp(outReal, -10.0f, 10.0f);
             //outReal = ScaleValue(outReal, -10.0f, 10.0f, outMin, outMax);

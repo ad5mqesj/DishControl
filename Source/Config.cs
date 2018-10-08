@@ -81,6 +81,7 @@ namespace DishControl
                 this.azKd.Text = settings.azKd.ToString();
                 this.azKi.Text = settings.azKi.ToString();
                 this.azKp.Text = settings.azKp.ToString();
+                this.Gain.Text = settings.azG.ToString();
                 this.azMax.Text = settings.azMax.ToString();
                 this.azMin.Text = settings.azMin.ToString();
                 this.azOutMax.Text = settings.azOutMax.ToString();
@@ -815,6 +816,14 @@ namespace DishControl
             double d;
             double.TryParse(this.SouthParkPosAz.Text, out d);
             settings.azSouthPark = d;
+        }
+
+
+        private void Gain_TextChanged(object sender, EventArgs e)
+        {
+            double d;
+            double.TryParse(this.Gain.Text, out d);
+            settings.azG = settings.elG = d;
         }
     }
 }

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
 using System.Text.RegularExpressions;
 
 using System.Windows.Forms;
@@ -42,12 +39,12 @@ namespace DishControl
             elEncoder = new Encoder(this.dev, this.settings, false);
             mainTimer = new System.Windows.Forms.Timer();
             mainTimer.Tick += new EventHandler(TimerEventProcessor);
-            mainTimer.Interval = 200;
+            mainTimer.Interval = 250;
 
-            azPid = new PID(settings.azKp, settings.azKi, settings.azKd, 360.0, 0.0, settings.azOutMax, settings.azOutMin, this.azReadPosition, this.azSetpoint, this.setAz);
+            azPid = new PID(settings.azKp, settings.azKi, settings.azKd, settings.azG, 360.0, 0.0, settings.azOutMax, settings.azOutMin, this.azReadPosition, this.azSetpoint, this.setAz);
             azPid.resolution = (settings.azMax - settings.azMin) / (double)((1 << settings.AzimuthEncoderBits) - 1);
 
-            elPid = new PID(settings.elKp, settings.elKi, settings.elKd, 360.0, 0.0, settings.elOutMax, settings.elOutMin, this.elReadPosition, this.elSetpoint, this.setEl);
+            elPid = new PID(settings.elKp, settings.elKi, settings.elKd, settings.elG, 360.0, 0.0, settings.elOutMax, settings.elOutMin, this.elReadPosition, this.elSetpoint, this.setEl);
             elPid.resolution = (settings.elMax - settings.elMin) / (double)((1 << settings.ElevationEncoderBits) - 1);
 
             azPos = settings.azPark;
@@ -92,6 +89,7 @@ namespace DishControl
                 {
                     state = DishState.Stopped;
                     dev.ResetDevice();
+                    MotionSetup();
 
                     azEncoder.SetupEncoderPorts();
                     elEncoder.SetupEncoderPorts();
@@ -107,6 +105,7 @@ namespace DishControl
                     //setup PWM
                     this.dev.PwmClockState = Eth32PwmClock.Enabled;
                     this.dev.PwmBasePeriod = 199; //10 khz
+
                     this.setAz(0.0);
                     this.setEl(0.0);
                     this.enableDrive(true);
@@ -231,7 +230,7 @@ namespace DishControl
             }
             return command;
         }
-        
+
         //for el we just go
         private double elSetpoint()
         {
@@ -379,8 +378,24 @@ namespace DishControl
             {
                 if (dev.Connected && state == DishState.Stopped)
                 {
+                    if (azCommand == -1.0)
+                    {
+                        //initialize old value in lowpass filter so 
+                        //it doesn't take too long to settle on startup
+                        azPos = azEncoder.countsToDegrees(0);
+                        elPos = elEncoder.countsToDegrees(0);
+                    }
                     azPos = azReadPosition();
                     elPos = elReadPosition();
+                    if (azCommand == -1.0)
+                    {
+                        azCommand = azPos;
+                        elCommand = elPos;
+                        GeoAngle mAzAngle = GeoAngle.FromDouble(azCommand, true);
+                        GeoAngle mElAngle = GeoAngle.FromDouble(elCommand);
+                        this.commandAz.Text = string.Format("{0} : {1}", mAzAngle.Degrees, mAzAngle.Minutes);
+                        this.commandEl.Text = string.Format("{2}{0} : {1}", mElAngle.Degrees, mElAngle.Minutes, mElAngle.IsNegative ? "-" : "");
+                    }
                 }
             }
 
