@@ -196,11 +196,11 @@ namespace DishControl
             }
 
             //read actual form encoders
-            if (dev.Connected && state == DishState.Stopped)
-            {
-                azPos = azReadPosition();
-                elPos = elReadPosition();
-            }
+            //if (dev.Connected && state == DishState.Stopped)
+            //{
+            //    azPos = azReadPosition();
+            //    elPos = elReadPosition();
+            //}
             //set up display variables in deg, min, sec format
             GeoAngle AzAngle = GeoAngle.FromDouble(azPos, true);
             GeoAngle ElAngle = GeoAngle.FromDouble(elPos);

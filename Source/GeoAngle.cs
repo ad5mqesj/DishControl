@@ -115,10 +115,14 @@ namespace DishControl
         {
             var multiplier = (point.Contains("S") || point.Contains("W")) ? -1 : 1; //handle south and west
 
-            point = Regex.Replace(point, "[^0-9. ]", ""); //remove the characters
+            point = Regex.Replace(point, "[^0-9. :]", ""); //remove the characters
 
-            var pointArray = point.Split(' '); //split the string.
+            var pointArray = point.Split(new char [] {':' }); //split the string.
 
+            for (int i = 0, j = pointArray.Length; i < j; i++)
+            {
+                pointArray[i] = Regex.Replace(pointArray[i], "[^0-9. ]", ""); //remove the characters
+            }
             //Decimal degrees = 
             //   whole number of degrees, 
             //   plus minutes divided by 60, 

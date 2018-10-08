@@ -159,13 +159,7 @@ namespace DishControl
 
             this._lastCount = retv;
             uint ret = retv + (uint)(this._rotations * maxRawCounts);
-/*            if (ret >= (uint)this.OffsetCounts)
-                ret = ret - (uint)this.OffsetCounts;
-            else
-            {
-                ret = ret + (uint)maxRawCounts - (uint)this.OffsetCounts;
-            }
-*/            return ret;
+            return ret;
         }
 
         public double countsToDegrees(uint encoderCounts)
@@ -177,6 +171,8 @@ namespace DishControl
                 retv -= 360.0;
             else if (retv < 0.0)
                 retv += 360.0;
+            if (retv > 359.92)  //account for rounding in conversion
+                retv = 0.0;
             return retv;
 
         }

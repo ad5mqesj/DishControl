@@ -24,7 +24,7 @@ namespace DishControl
         Encoder azEncoder = null, elEncoder = null;
         double azCommand = -1.0, elCommand, RAcommand, decCommand;
         bool azForward = true;
-        public double azPos = 0.0, elPos = 0.0;
+        public double azPos = -1.0, elPos = 0.0;
         PID azPid = null;
         PID elPid = null;
         int outputPortNum = 2;
@@ -349,7 +349,7 @@ namespace DishControl
 
         }
 
-        //this is ThreadExceptionDialog actual thread handler for the watchdog timer
+        //this is Thread callback actual thread handler for the watchdog timer
         //similar to button thread
         private void updateThreadCallback()
         {
@@ -367,13 +367,31 @@ namespace DishControl
         private void timer_Tick()
         {
             WatchdoLoopcount++;
-            if (WatchdoLoopcount > 9)
+            if (WatchdoLoopcount > 19)
                 WatchdoLoopcount = 0;
             int bitState = (WatchdoLoopcount) % 5 > 0 ? 1 : 0; //1:5 duty cycle
             lock (this.dev)
             {
                 this.dev.OutputBit(4, 0, bitState);
             }
+
+            if (WatchdoLoopcount == 0)
+            {
+                if (dev.Connected && state == DishState.Stopped)
+                {
+                    azPos = azReadPosition();
+                    elPos = elReadPosition();
+                }
+            }
+
+            if (state != DishState.Stopped && state != DishState.Unknown)
+            {
+                if (azPid.Complete && elPid.Complete)
+                {
+                    this.Stop();
+                }
+            }
+
         }
 
 

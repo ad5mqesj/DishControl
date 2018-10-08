@@ -28,7 +28,7 @@ namespace DishControl
             InitializeComponent();
             this.dev = dev;
             this.settings = settings;
-            if (settings.latitude != 0.0)
+            if (settings.AzimuthEncoderBits != 0)
             {
                 
                 this.latitude.Text = GeoAngle.FromDouble (settings.latitude).ToString("NS");

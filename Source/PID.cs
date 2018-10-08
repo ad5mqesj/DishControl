@@ -264,6 +264,10 @@ namespace PIDLibrary
                     int sleepTime = (int)(1000 / computeHz);
                     Thread.Sleep(sleepTime);
                     Compute();
+                    if (motionComplete)
+                    {
+                        break;
+                    }
                 }
                 catch (Exception e)
                 {
