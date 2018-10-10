@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2041
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DishControl", "Source\DishControl.csproj", "{B7BD0B61-1DED-4ACB-895C-9B75482CA9F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DishControl.Service", "DishControlService\DishControl.Service.csproj", "{4AF7D671-DBF0-4A28-90A4-3189A1D4E728}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,8 +17,15 @@ Global
 		{B7BD0B61-1DED-4ACB-895C-9B75482CA9F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B7BD0B61-1DED-4ACB-895C-9B75482CA9F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B7BD0B61-1DED-4ACB-895C-9B75482CA9F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4AF7D671-DBF0-4A28-90A4-3189A1D4E728}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AF7D671-DBF0-4A28-90A4-3189A1D4E728}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AF7D671-DBF0-4A28-90A4-3189A1D4E728}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AF7D671-DBF0-4A28-90A4-3189A1D4E728}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2A4F0CCB-B680-4855-8665-A655358FF06F}
 	EndGlobalSection
 EndGlobal
