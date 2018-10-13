@@ -13,7 +13,7 @@ namespace DishControl.Service
 		public WebApiService()
 		{
 			InitializeComponent();
-			//Program.Log.Write("WebApi: Start");
+			BasicLog.writeLog("WebApi: Start");
 		}
 
 #if DEBUG
@@ -28,15 +28,15 @@ namespace DishControl.Service
 		protected override void OnStart(string[] args)
 		{
 			string baseAddress = ConfigurationManager.AppSettings["WebAPIBaseAddress"];
-			//Program.Log.Write("WebApi: Start");
+            BasicLog.writeLog("WebApi: Start");
 			WebApp.Start<WebApi>(url: baseAddress);
-			//Program.Log.Write("WebApi: Complete");
-		}
+            BasicLog.writeLog("WebApi: Complete");
+        }
 
-		protected override void OnStop()
+        protected override void OnStop()
 		{
-			//Program.Log.Write("WebApi: OnStart");
-			// noone seems to worry about the shutdown...	
-		}
-	}
+            BasicLog.writeLog("WebApi: OnStart");
+            // noone seems to worry about the shutdown...	
+        }
+    }
 }

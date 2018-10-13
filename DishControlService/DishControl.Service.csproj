@@ -88,6 +88,7 @@
     <Compile Include="Models\configModel.cs" />
     <Compile Include="Models\DataDelegates.cs" />
     <Compile Include="Models\SystemState.cs" />
+    <Compile Include="MotionControl.cs" />
     <Compile Include="PID.cs" />
     <Compile Include="WebApiService.cs">
       <SubType>Component</SubType>
