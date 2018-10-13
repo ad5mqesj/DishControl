@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DishControl.Service</RootNamespace>
     <AssemblyName>DishControl.Service</AssemblyName>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
@@ -37,6 +37,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Eth32, Version=2.1.5917.27981, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Program Files (x86)\winford\eth32\api\windows\ms.net\Eth32.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Owin, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.4.0.0\lib\net451\Microsoft.Owin.dll</HintPath>
     </Reference>
@@ -74,7 +78,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApi.cs" />
+    <Compile Include="Astro\celestialConversion.cs" />
+    <Compile Include="Astro\GeoAngle.cs" />
+    <Compile Include="Astro\SunCalc.cs" />
+    <Compile Include="BasicLog.cs" />
     <Compile Include="Controller\PingController.cs" />
+    <Compile Include="Encoder.cs" />
+    <Compile Include="Eth32Fake.cs" />
+    <Compile Include="Models\configModel.cs" />
+    <Compile Include="Models\DataDelegates.cs" />
+    <Compile Include="Models\SystemState.cs" />
+    <Compile Include="PID.cs" />
     <Compile Include="WebApiService.cs">
       <SubType>Component</SubType>
     </Compile>

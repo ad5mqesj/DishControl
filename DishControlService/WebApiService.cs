@@ -1,9 +1,9 @@
-﻿using Microsoft.Owin.Hosting;
-using System.Configuration;
+﻿using System.Configuration;
 using System.ServiceProcess;
 using DishControl.App_Start;
+using Microsoft.Owin.Hosting;
 
-namespace DishContorl.Service
+namespace DishControl.Service
 {
 	public partial class WebApiService : ServiceBase
 	{

@@ -7,7 +7,7 @@ using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DishContorl.Service
+namespace DishControl.Service
 {
 
 	public static class Program

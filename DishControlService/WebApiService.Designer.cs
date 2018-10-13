@@ -1,4 +1,4 @@
-﻿namespace DishContorl.Service
+﻿namespace DishControl.Service
 {
 	partial class WebApiService
 	{
@@ -29,7 +29,7 @@
 		private void InitializeComponent()
 		{
 			components = new System.ComponentModel.Container();
-			this.ServiceName = "DishContorl.Service";
+			this.ServiceName = "DishControl.Service";
 		}
 
 		#endregion
