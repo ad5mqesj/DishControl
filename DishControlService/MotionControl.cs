@@ -54,6 +54,7 @@ namespace DishControl.Service
             bUpdating = false;
             btEnabled = true;
             TimerTickms = 10;
+            dev = new Eth32();
             this.initializeConfig();
 
         }
