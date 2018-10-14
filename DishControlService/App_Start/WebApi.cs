@@ -18,7 +18,7 @@ namespace DishControl.App_Start
 			HttpConfiguration config = new HttpConfiguration();
 			config.Routes.MapHttpRoute(
 				name: "DefaultApi",
-				routeTemplate: "api/{int:tenantId}/{controller}/{id}",
+				routeTemplate: "{controller}/{id}",
 				defaults: new { id = RouteParameter.Optional }
 			);
 

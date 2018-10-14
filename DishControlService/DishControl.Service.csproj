@@ -23,7 +23,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;_TEST</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -82,11 +82,13 @@
     <Compile Include="Astro\GeoAngle.cs" />
     <Compile Include="Astro\SunCalc.cs" />
     <Compile Include="BasicLog.cs" />
+    <Compile Include="Controller\DishController.cs" />
     <Compile Include="Controller\PingController.cs" />
     <Compile Include="Encoder.cs" />
     <Compile Include="Eth32Fake.cs" />
     <Compile Include="Models\configModel.cs" />
     <Compile Include="Models\DataDelegates.cs" />
+    <Compile Include="Models\PositionResult.cs" />
     <Compile Include="Models\SystemState.cs" />
     <Compile Include="MotionControl.cs" />
     <Compile Include="PID.cs" />

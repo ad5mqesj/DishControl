@@ -26,8 +26,8 @@ namespace DishControl.Service
         public double decCommand { get; set; }
         public double azPos { get; set; }
         public double elPos { get; set; }
+        public bool appConfigured { get; set; }
 
-        private bool appConfigured = false;
         private Eth32 dev = null;
         private Thread updateThread = null;
         private Encoder azEncoder = null, elEncoder = null;
@@ -58,6 +58,11 @@ namespace DishControl.Service
 
         }
 
+        public bool isConnected()
+        {
+            return dev.Connected;
+        }
+
         private void initializeConfig()
         {
             string exe = Process.GetCurrentProcess().MainModule.FileName;
@@ -73,11 +78,12 @@ namespace DishControl.Service
             else
             {
                 settings = new configModel();
+                appConfigured = false;
             }//no config found - use defaults
 
         }
         //called to set up motion control sepcific objects: encoder reader class, and PID loops for each axis
-        private void MotionSetup()
+        public void MotionSetup()
         {
             string resultString = Regex.Match(settings.outputPort, @"\d+").Value;
             Int32.TryParse(resultString, out outputPortNum);
@@ -98,7 +104,8 @@ namespace DishControl.Service
             this.updateThread = new Thread(timer_Tick);
             this.updateThread.Priority = ThreadPriority.Highest;
         }
-        private void Connect(bool bSameAddress = true)
+
+        public void Connect(bool bSameAddress = true)
         {
             if (settings.eth32Address.Length == 0)
             {
