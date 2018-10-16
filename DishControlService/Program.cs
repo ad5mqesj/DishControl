@@ -9,20 +9,18 @@ using System.Threading.Tasks;
 
 namespace DishControl.Service
 {
-
 	public static class Program
 	{
 
         static public MotionControl mControl;
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         static void Main()
 		{
 			WebApiService webapiservice = null;
-
 #if DEBUG
-
             if (Debugger.IsAttached)
 			{
                 BasicLog.writeLog("Debug Console mode");
@@ -44,8 +42,6 @@ namespace DishControl.Service
                 BasicLog.writeLog("Run: Call");				
 				ServiceBase.Run(ServicesToRun);
 			}
-
-
 		}
 	}
 }

@@ -6,15 +6,15 @@ namespace DishControl.Service.Controller
 {
     public class PingController : ApiController
     {
-        //[HttpGet]
-        //[Route("api/Ping")]
-        //public string Get()
-        //{
-        //    return "Dish Control Service";
-        //}
+        [HttpGet]
+        [Route("Ping")]
+        public string Get()
+        {
+            return "Dish Control Service";
+        }
 
         [HttpGet]
-        [Route("api/FullPing")]
+        [Route("FullPing")]
         public string GetFullPing()
         {
             Assembly asm = Assembly.GetExecutingAssembly();

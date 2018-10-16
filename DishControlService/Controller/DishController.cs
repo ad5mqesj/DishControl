@@ -12,12 +12,14 @@ namespace DishControl.Service.Controller
     public class DishController : ApiController
     {
         [HttpGet]
+        [Route("ConnectionStatus")]
         public JsonResult<bool> GetConnectionStatus()
         {
             return Json(Program.mControl.isConnected());
         }
 
         [HttpGet]
+        [Route("Position")]
         public JsonResult<PositionResult> GetPosition()
         {
             RaDec astro = celestialConversion.CalcualteRaDec(Program.mControl.elPos, Program.mControl.azPos, Program.mControl.settings.latitude, Program.mControl.settings.longitude);
