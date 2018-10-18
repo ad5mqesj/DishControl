@@ -12,6 +12,7 @@ using DishControl.Service.PIDLibrary;
 using System.Threading;
 using System.IO;
 using System.Diagnostics;
+using DishControl.Service.Models;
 
 namespace DishControl.Service
 {
@@ -20,6 +21,7 @@ namespace DishControl.Service
 
         public configModel settings { get; set; }
         public DishState state { get; set; } 
+        public bool Tracking { get; set; }
         public double azCommand { get; set; }
         public double elCommand { get; set; }
         public double RAcommand { get; set; }
@@ -54,6 +56,7 @@ namespace DishControl.Service
             bUpdating = false;
             btEnabled = true;
             TimerTickms = 10;
+            Tracking = false;
             dev = new Eth32();
             this.initializeConfig();
 
@@ -62,6 +65,16 @@ namespace DishControl.Service
         public bool isConnected()
         {
             return dev.Connected;
+        }
+
+        public Status getStatus()
+        {
+            return new Status()
+            {
+                State = this.state,
+                Connected = this.dev.Connected,
+                Tracking = this.Tracking
+            };
         }
 
         private void initializeConfig()

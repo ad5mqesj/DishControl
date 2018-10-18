@@ -8,14 +8,14 @@ namespace DishControl.Service.Controller
     {
         [HttpGet]
         [Route("Ping")]
-        public string Get()
+        public string Ping()
         {
             return "Dish Control Service";
         }
 
         [HttpGet]
         [Route("FullPing")]
-        public string GetFullPing()
+        public string FullPing()
         {
             Assembly asm = Assembly.GetExecutingAssembly();
             var retval = new 

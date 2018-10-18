@@ -13,9 +13,9 @@ namespace DishControl.Service.Controller
     {
         [HttpGet]
         [Route("ConnectionStatus")]
-        public JsonResult<bool> GetConnectionStatus()
+        public JsonResult<Status> GetStatus()
         {
-            return Json(Program.mControl.isConnected());
+            return Json(Program.mControl.getStatus());
         }
 
         [HttpGet]

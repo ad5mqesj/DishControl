@@ -89,6 +89,7 @@
     <Compile Include="Models\configModel.cs" />
     <Compile Include="Models\DataDelegates.cs" />
     <Compile Include="Models\PositionResult.cs" />
+    <Compile Include="Models\Status.cs" />
     <Compile Include="Models\SystemState.cs" />
     <Compile Include="MotionControl.cs" />
     <Compile Include="PID.cs" />

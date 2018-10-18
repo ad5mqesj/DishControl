@@ -14,18 +14,18 @@ namespace DishControl.App_Start
 		// parameter in the WebApp.Start method.
 		public void Configuration(IAppBuilder appBuilder)
 		{
-			// Configure Web API for self-host. 
-			HttpConfiguration config = new HttpConfiguration();
-			config.Routes.MapHttpRoute(
-				name: "DefaultApi",
-				routeTemplate: "api/{controller}/{id}",
-				defaults: new { id = RouteParameter.Optional }
-			);
+            // Configure Web API for self-host. 
+            HttpConfiguration config = new HttpConfiguration();
             config.Routes.MapHttpRoute(
-                name: "Default",
-                routeTemplate: "{controller}/{action}/{id}",
+                name: "DefaultApi",
+                routeTemplate: "api/{controller}/{action}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
+            //config.Routes.MapHttpRoute(
+            //    name: "Default",
+            //    routeTemplate: "{controller}/{action}/{id}",
+            //    defaults: new { id = RouteParameter.Optional }
+            //);
 
             appBuilder.UseWebApi(config);
 		}

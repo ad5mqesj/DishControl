@@ -42,7 +42,7 @@ namespace DishControl.Service
 
         protected override void OnStop()
 		{
-            BasicLog.writeLog("WebApi: OnStart");
+            BasicLog.writeLog("WebApi: OnStop");
             // noone seems to worry about the shutdown...	
         }
     }
