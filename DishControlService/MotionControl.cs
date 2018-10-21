@@ -20,7 +20,7 @@ namespace DishControl.Service
     {
 
         public configModel settings { get; set; }
-        public DishState state { get; set; } 
+        public DishState state { get; set; }
         public bool Tracking { get; set; }
         public double azCommand { get; set; }
         public double elCommand { get; set; }
@@ -38,20 +38,21 @@ namespace DishControl.Service
         private PID elPid = null;
         private int outputPortNum = 2;
         private int WatchdoLoopcount = 0;
-        private int currentIncrement = 0;
         private delegate void TimerEventDel();
         private bool bUpdating;
         private bool btEnabled;
         private int TimerTickms;
+        private static ManualResetEvent AzPositionRead = new ManualResetEvent(false);
+        private static ManualResetEvent ElPositionRead = new ManualResetEvent(false);
 
         public MotionControl()
         {
-          state = DishState.Unknown;
-            azCommand = 0.0;
+            state = DishState.Unknown;
+            azCommand = -1000.0;
             elCommand = 0.0;
             RAcommand = 0.0;
             decCommand = 0.0;
-            azPos = -1.0;
+            azPos = 0.0;
             elPos = 0.0;
             bUpdating = false;
             btEnabled = true;
@@ -59,7 +60,6 @@ namespace DishControl.Service
             Tracking = false;
             dev = new Eth32();
             this.initializeConfig();
-
         }
 
         public bool isConnected()
@@ -105,10 +105,10 @@ namespace DishControl.Service
             azEncoder = new Encoder(this.dev, this.settings, true);
             elEncoder = new Encoder(this.dev, this.settings, false);
 
-            azPid = new PID(settings.azKp, settings.azKi, settings.azKd, settings.azG, 360.0, 0.0, settings.azOutMax, settings.azOutMin, this.azReadPosition, this.azSetpoint, this.setAz);
+            azPid = new PID(settings.azKp, settings.azKi, settings.azKd, settings.azG, 360.0, 0.0, settings.azOutMax, settings.azOutMin, this.synchronousAzRead, this.azSetpoint, this.setAz);
             azPid.resolution = (settings.azMax - settings.azMin) / (double)((1 << settings.AzimuthEncoderBits) - 1);
 
-            elPid = new PID(settings.elKp, settings.elKi, settings.elKd, settings.elG, 360.0, 0.0, settings.elOutMax, settings.elOutMin, this.elReadPosition, this.elSetpoint, this.setEl);
+            elPid = new PID(settings.elKp, settings.elKi, settings.elKd, settings.elG, 360.0, 0.0, settings.elOutMax, settings.elOutMin, this.synchronousElRead, this.elSetpoint, this.setEl);
             elPid.resolution = (settings.elMax - settings.elMin) / (double)((1 << settings.ElevationEncoderBits) - 1);
 
             azPos = settings.azPark;
@@ -123,7 +123,7 @@ namespace DishControl.Service
         {
             if (settings.eth32Address.Length == 0)
             {
-                BasicLog.writeLog ("Please configure the eht32 in Options->Settings");
+                BasicLog.writeLog("Please configure the eht32 in Options->Settings");
                 return;
             }
 
@@ -214,19 +214,18 @@ namespace DishControl.Service
             double retval;
             if (dev.Connected)
             {
-                bUpdating = true;
-                lock (this.dev)
-                {
-                    curval = azEncoder.countsToDegrees(azEncoder.readNormalizedEncoderBits());
-                }
+                curval = azEncoder.countsToDegrees(azEncoder.readNormalizedEncoderBits());
                 this.azPos = LowPass(this.azPos, curval);
-                if (bUpdating)
-                    bUpdating = false;
             }
             retval = (this.azForward ? this.azPos : this.azPos - 360.0);
             return retval;
         }
 
+        public double synchronousAzRead()
+        {
+            AzPositionRead.WaitOne(250);
+            return azPos;
+        }
         //read and filter el position, filtered to reduce jitter near bit transitions
         public double elReadPosition()
         {
@@ -234,17 +233,17 @@ namespace DishControl.Service
             double retval;
             if (dev.Connected)
             {
-                bUpdating = true;
-                lock (this.dev)
-                {
-                    curval = elEncoder.countsToDegrees(elEncoder.readNormalizedEncoderBits());
-                }
+                curval = elEncoder.countsToDegrees(elEncoder.readNormalizedEncoderBits());
                 this.elPos = LowPass(this.elPos, curval);
-                if (bUpdating)
-                    bUpdating = false;
             }
             retval = this.elPos;
+
             return retval;
+        }
+        public double synchronousElRead()
+        {
+            ElPositionRead.WaitOne(250);
+            return elPos;
         }
 
         //compute shortest path to commanded az position
@@ -418,8 +417,7 @@ namespace DishControl.Service
         //actual watchdog pulse generator
         private void timer_Tick()
         {
-            WatchdoLoopcount++;
-            if (WatchdoLoopcount > 19)
+            if (WatchdoLoopcount > 9)
                 WatchdoLoopcount = 0;
             int bitState = (WatchdoLoopcount) % 5 > 0 ? 1 : 0; //1:5 duty cycle
             lock (this.dev)
@@ -429,22 +427,22 @@ namespace DishControl.Service
 
             if (WatchdoLoopcount == 0)
             {
-                if (dev.Connected && state == DishState.Stopped)
+                if (azCommand == -1000.0)
                 {
-                    if (azCommand == -1.0)
-                    {
-                        //initialize old value in lowpass filter so 
-                        //it doesn't take too long to settle on startup
-                        azPos = azEncoder.countsToDegrees(0);
-                        elPos = elEncoder.countsToDegrees(0);
-                    }
-                    azPos = azReadPosition();
-                    elPos = elReadPosition();
-                    if (azCommand == -1.0)
-                    {
-                        azCommand = azPos;
-                        elCommand = elPos;
-                    }
+                    //initialize old value in lowpass filter so 
+                    //it doesn't take too long to settle on startup
+                    azPos = azEncoder.countsToDegrees(0);
+                    elPos = elEncoder.countsToDegrees(0);
+                }
+                azPos = azReadPosition();
+                AzPositionRead.Set();
+                elPos = elReadPosition();
+                ElPositionRead.Set();
+
+                if (azCommand == -1000.0)
+                {
+                    azCommand = azPos;
+                    elCommand = elPos;
                 }
             }
 
@@ -455,8 +453,9 @@ namespace DishControl.Service
                     this.Stop();
                 }
             }
-
+            WatchdoLoopcount++;
         }
+
         public void Stop()
         {
             azPid.Disable();
