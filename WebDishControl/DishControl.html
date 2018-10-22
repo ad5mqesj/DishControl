@@ -12,17 +12,17 @@
 </head>
 <body>
     <div class="positionBlock">
-        <div class="astro">
-            <label>R.A.</label>
-            <span data-bind="text: viewModel.RA"></span>
-            <label>DEC</label>
-            <span data-bind="text: viewModel.DEC"></span>
+        <div class="astro aligned_form">
+            <label for="raNow">R.A.</label>
+            <span id="raNow" data-bind="text: viewModel.RA"></span>
+            <label for="decNow">DEC</label>
+            <span id="decNow" data-bind="text: viewModel.DEC"></span>
         </div>
-        <div class="mount">
-            <label>Azimuth</label>
-            <span data-bind="text: viewModel.Azimuth"></span>
-            <label>Elevation</label>
-            <span data-bind="text: viewModel.Elevation"></span>
+        <div class="mount aligned_form">
+            <label for="azNow">Azimuth</label>
+            <span id="azNow" data-bind="text: viewModel.Azimuth"></span>
+            <label for="elNow">Elevation</label>
+            <span id="elNow" data-bind="text: viewModel.Elevation"></span>
         </div>
     </div>
     <div class="status">
