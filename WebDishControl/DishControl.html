@@ -3,8 +3,30 @@
 <head>
     <meta charset="utf-8" />
     <title>DishControl</title>
+    <link href="Content/bootstrap.css" rel="stylesheet" type="text/css" media="all" />
+    <link href="Content/DishControl.css" rel="stylesheet" type="text/css" media="all" />
+    <script language=JavaScript src="Scripts/jquery-3.3.1.js" type=text/javascript></script>
+    <script language=JavaScript src="Scripts/knockout-3.4.2.js" type=text/javascript></script>
+    <script language=JavaScript src="Scripts/bootstrap.js" type=text/javascript></script>
+    <script language=JavaScript src="Scripts/DishControl.js" type=text/javascript></script>
 </head>
 <body>
+    <div class="positionBlock">
+        <div class="astro">
+            <label>R.A.</label>
+            <span data-bind="text: viewModel.RA"></span>
+            <label>DEC</label>
+            <span data-bind="text: viewModel.DEC"></span>
+        </div>
+        <div class="mount">
+            <label>Azimuth</label>
+            <span data-bind="text: viewModel.Azimuth"></span>
+            <label>Elevation</label>
+            <span data-bind="text: viewModel.Elevation"></span>
+        </div>
+    </div>
+    <div class="status">
 
+    </div>
 </body>
 </html>
