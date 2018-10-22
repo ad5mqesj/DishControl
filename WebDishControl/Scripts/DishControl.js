@@ -4,10 +4,10 @@
 
 var viewModel = {
     basePath: null,
-    RA: ko.observable(),
-    DEC: ko.observable(),
-    Azimuth: ko.observable(),
-    Elevation: ko.observable(),
+    RA: ko.observable("0:0:0"),
+    DEC: ko.observable("0:0:0"),
+    Azimuth: ko.observable("0:0:0"),
+    Elevation: ko.observable("0:0:0"),
 
     RACommand: ko.observable(),
     DECCommand: ko.observable(),
