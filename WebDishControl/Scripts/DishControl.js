@@ -2,6 +2,38 @@
     viewModel.Load();
 });
 
+class dishStatus
+{
+    constructor() {
+        this.connected = ko.observable();
+        this.state = ko.observable();
+        this.tracking = ko.observable();
+    }
+
+    connectedColor() {
+        if (this.connected())
+            return 'Green';
+        else
+            return 'Red';
+    }
+
+    stateColor() {
+        if (this.state() == 'Stopped')
+            return 'Green';
+        else if (this.state() == 'Unknown')
+            return 'Red';
+        else
+            return 'Yellow';
+    }
+
+    trackingColor() {
+        if (this.tracking())
+            return 'Blue';
+        return 'Transparent';
+    }
+
+}
+
 var viewModel = {
     basePath: null,
     RA: ko.observable("0:0:0"),
@@ -13,6 +45,7 @@ var viewModel = {
     DECCommand: ko.observable(),
     AzCommand: ko.observable(),
     ElCommand: ko.observable(),
+    status: null,
 
     timerId: -1,
 
@@ -34,8 +67,9 @@ var viewModel = {
     Load: function () {
         var self = viewModel;
         self.basePath = 'http://localhost:9000/DishControl/';
-
+        self.status = new dishStatus();
         self.timerId = setInterval(self.timerCallback, 200);
+        ko.applyBindings();
     },
 
     timerCallback: function () {
@@ -45,6 +79,11 @@ var viewModel = {
             self.Elevation(data.formattedElevation);
             self.RA(data.formattedRightAscension);
             self.DEC(data.formattedDeclination);
+        });
+        $.get(self.basePath + 'api/Dish/GetStatus', function (data) {
+            self.status.connected(data.Connected);
+            self.status.tracking(data.Tracking);
+            self.status.state(data.State);
         });
     },
 

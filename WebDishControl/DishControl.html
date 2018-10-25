@@ -11,22 +11,73 @@
     <script language=JavaScript src="Scripts/DishControl.js" type=text/javascript></script>
 </head>
 <body>
-    <div class="positionBlock">
-        <div class="astro aligned_form">
-            <label for="raNow">R.A.</label>
-            <span id="raNow" data-bind="text: viewModel.RA"></span>
-            <label for="decNow">DEC</label>
-            <span id="decNow" data-bind="text: viewModel.DEC"></span>
+    <div class="container topRow">
+        <div class="row">
+            <div class="col-lg">
+                <div class="positionBlock aligned_form border border-primary rounded">
+                    <div class="astro  container">
+                        <div class="row">
+                            <div class="col-sm">
+                                <label for="raNow">R.A.</label>
+                            </div>
+                            <div class="col-sm">
+                                <span id="raNow" data-bind="text: viewModel.RA"></span>
+                            </div>
+                            <div class="col-sm">
+                                <label for="decNow">DEC</label>
+                            </div>
+                            <div class="col-sm">
+                                <span id="decNow" data-bind="text: viewModel.DEC"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mount aligned_form">
+                        <div class="row">
+                            <div class="col-sm">
+                                <label for="azNow">Azimuth</label>
+                            </div>
+                            <div class="col-sm">
+                                <span id="azNow" data-bind="text: viewModel.Azimuth"></span>
+                            </div>
+                            <div class="col-sm">
+                                <label for="elNow">Elevation</label>
+                            </div>
+                            <div class="col-sm">
+                                <span id="elNow" data-bind="text: viewModel.Elevation"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!--actual pos-->
+            </div>
+            <div class="col-lg">
+                <div class="status aligned_form border border-primary rounded">
+                    <div class="row">
+                        <div class="col-sm">
+                            <span id="connected" class="border" data-bind="style:{ 'background-color' :  viewModel.status.connectedColor() }"></span>
+                        </div>
+                        <div class="col-sm">
+                            <label for="connected">Connected (Green: connected)</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm">
+                            <span id="state" class="border" data-bind="style:{ 'background-color' :  viewModel.status.stateColor() }"></span>
+                        </div>
+                        <div class="col-sm">
+                            <label for="state">Moving (Red: moving, Green: safe, Yellow: unkown)</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm">
+                            <span id="track" class="border" data-bind="style:{ 'background-color' :  viewModel.status.trackingColor() }"></span>
+                        </div>
+                        <div class="col-sm">
+                            <label for="track">Tracking (Blue: tracking)</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="mount aligned_form">
-            <label for="azNow">Azimuth</label>
-            <span id="azNow" data-bind="text: viewModel.Azimuth"></span>
-            <label for="elNow">Elevation</label>
-            <span id="elNow" data-bind="text: viewModel.Elevation"></span>
-        </div>
-    </div>
-    <div class="status">
-
     </div>
 </body>
 </html>
