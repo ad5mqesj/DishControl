@@ -9,6 +9,7 @@ namespace DishControl
 {
     static class Program
     {
+        public static SharedState state; 
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -20,6 +21,7 @@ namespace DishControl
 #else
             Eth32 dev = new Eth32();
 #endif
+            state = new SharedState();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new MainForm(dev));

@@ -14,8 +14,9 @@ using System.Threading;
 
 namespace DishControl
 {
-    public partial class MainForm : Form
+    public class MainMotion
     {
+        configModel settings;
         Eth32 dev = null;
         Thread updateThread = null;
         Encoder azEncoder = null, elEncoder = null;
@@ -28,6 +29,13 @@ namespace DishControl
         int WatchdoLoopcount = 0;
         int currentIncrement = 0;
         private delegate void TimerEventDel();
+        bool btEnabled = true;
+        int TimerTickms = 10;
+
+        public MainMotion (Eth32 dev)
+        {
+            this.dev = dev;
+        }
 
         //called to set up motion control sepcific objects: encoder reader class, and PID loops for each axis
         public void MotionSetup()
@@ -37,9 +45,9 @@ namespace DishControl
 
             azEncoder = new Encoder(this.dev, this.settings, true);
             elEncoder = new Encoder(this.dev, this.settings, false);
-            mainTimer = new System.Windows.Forms.Timer();
-            mainTimer.Tick += new EventHandler(TimerEventProcessor);
-            mainTimer.Interval = 250;
+            //mainTimer = new System.Windows.Forms.Timer();
+            //mainTimer.Tick += new EventHandler(TimerEventProcessor);
+            //mainTimer.Interval = 250;
 
             azPid = new PID(settings.azKp, settings.azKi, settings.azKd, settings.azG, 360.0, 0.0, settings.azOutMax, settings.azOutMin, this.azReadPosition, this.azSetpoint, this.setAz);
             azPid.resolution = (settings.azMax - settings.azMin) / (double)((1 << settings.AzimuthEncoderBits) - 1);
@@ -63,9 +71,6 @@ namespace DishControl
                 MessageBox.Show("Please configure the eht32 in Options->Settings");
                 return;
             }
-            if (mainTimer != null)
-                mainTimer.Stop();
-            bRunTick = false;
 
             // If we're already connected, disconnect and reconnect
             if (dev.Connected && !bSameAddress)
@@ -87,7 +92,7 @@ namespace DishControl
 
                 if (dev.Connected)
                 {
-                    state = DishState.Stopped;
+                    Program.state.state = DishState.Stopped;
                     dev.ResetDevice();
                     MotionSetup();
 
@@ -109,8 +114,6 @@ namespace DishControl
                     this.setAz(0.0);
                     this.setEl(0.0);
                     this.enableDrive(true);
-                    mainTimer.Start();
-                    bRunTick = true;
                 }
             }
             catch (Eth32Exception etherr)
@@ -157,14 +160,11 @@ namespace DishControl
             double retval;
             if (dev.Connected)
             {
-                bUpdating = true;
                 lock (this.dev)
                 {
                     curval = azEncoder.countsToDegrees(azEncoder.readNormalizedEncoderBits());
                 }
                 this.azPos = LowPass(this.azPos, curval);
-                if (bUpdating)
-                    bUpdating = false;
             }
             retval = (this.azForward ? this.azPos : this.azPos - 360.0);
             return retval;
@@ -177,14 +177,11 @@ namespace DishControl
             double retval;
             if (dev.Connected)
             {
-                bUpdating = true;
                 lock (this.dev)
                 {
                     curval = elEncoder.countsToDegrees(elEncoder.readNormalizedEncoderBits());
                 }
                 this.elPos = LowPass(this.elPos, curval);
-                if (bUpdating)
-                    bUpdating = false;
             }
             retval = this.elPos;
             return retval;

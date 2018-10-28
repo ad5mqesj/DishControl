@@ -99,6 +99,7 @@
     <Compile Include="PID.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SharedState.cs" />
     <Compile Include="SunCalc.cs" />
     <Compile Include="SystemState.cs" />
     <Compile Include="testDrive.cs">

@@ -26,9 +26,10 @@ namespace DishControl
     };
     public partial class MainForm : Form
     {
+        Eth32 dev = null;
         configModel settings;
         bool appConfigured = false;
-        DishState state = DishState.Unknown;
+ //       DishState state = DishState.Unknown;
         System.Windows.Forms.Timer mainTimer = null;
         bool bRunTick = false;
         bool trackCelestial = false;
@@ -37,10 +38,8 @@ namespace DishControl
         DateTime messageTime = DateTime.Now;
         Thread buttonThread;
         ManualResetEvent jogEvent;
-        bool btEnabled = true;
         buttonDir direction;
         List<presets> Presets = null;
-        int TimerTickms = 10;
 
         public MainForm(Eth32 dev)
         {
