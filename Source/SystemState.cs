@@ -15,5 +15,12 @@ namespace DishControl
         Parking
     }
 
-    
+    public enum CommandType
+    {
+        Unknown,
+        Jog,
+        Move,
+        Track,
+        Stop
+    }
 }

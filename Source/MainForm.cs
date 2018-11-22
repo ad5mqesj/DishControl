@@ -12,7 +12,6 @@ using InterfaceFake;
 using WinfordEthIO;
 #endif
 
-using PIDLibrary;
 using System.Threading;
 
 namespace DishControl
@@ -24,12 +23,11 @@ namespace DishControl
         North,
         South
     };
+
     public partial class MainForm : Form
     {
         Eth32 dev = null;
         configModel settings;
-        bool appConfigured = false;
- //       DishState state = DishState.Unknown;
         System.Windows.Forms.Timer mainTimer = null;
         bool bRunTick = false;
         bool trackCelestial = false;
@@ -45,8 +43,6 @@ namespace DishControl
         {
             //set up UI control attributes (auto-generated)
             InitializeComponent();
-
-            this.dev = dev;
             
             //setup for jog button handler thread, triggering event
             jogEvent = new ManualResetEvent(false);
@@ -58,7 +54,8 @@ namespace DishControl
             if (File.Exists(configFile))
             {
                 settings = configFileHandler.readConfig(configFile);
-                appConfigured = true;
+                Program.state.appConfigured = true;
+                Program.state.connectEvent.Set();
             }//if config exists
             else
             {
@@ -68,14 +65,15 @@ namespace DishControl
                 {
                     configFileHandler.writeConfig(configFile, cfgDialog.settings);
                     MessageBox.Show("Saved");
-                    appConfigured = true;
+                    Program.state.appConfigured = true;
+                    Program.state.connectEvent.Set();
                 }
             }//no config found
 
-            state = DishState.Unknown;
+            Program.state.state = DishState.Unknown;
 
             //set up presets, set up various Motion control objects, logger but only if config exists and is valid.
-            if (appConfigured)
+            if (Program.state.appConfigured)
             {
                 //get presets array
                 Presets = settings.getPresetList();
@@ -87,9 +85,9 @@ namespace DishControl
                     }
                 }
                 presetSelector.SelectedIndex = 0;
-
                 RollingLogger.setupRollingLogger(settings.positionFileLog, settings.maxPosLogSizeBytes, settings.maxPosLogFiles);
-
+                //we are configured so signal the Connect event so main motion can connect hardware
+                Program.state.connectEvent.Set();
             }//if config exists
         }
 
@@ -98,31 +96,42 @@ namespace DishControl
         //jog Increment setting for 1/2 second.
         private void buttonThreadHandler()
         {
-            while (btEnabled)
+            while (Program.state.btEnabled)
             {
                 jogEvent.WaitOne();
-                if (!btEnabled)
+                if (!Program.state.btEnabled) // bail if we are being singalled due to exit
                     return;
-
+                if (Program.state.state != DishState.Stopped) //do nothing if already moving, or in unknown state
+                {
+                    jogEvent.Reset();
+                    continue;
+                }
                 double curvel = this.settings.jogIncrement;
                 double dirMul = 1.0;
                 if (this.direction == buttonDir.South || this.direction == buttonDir.East)
                     dirMul = -1.0;
-                state = DishState.Moving;
+                Program.state.state = DishState.Moving;
                 updateStatus();
+
                 if (this.direction == buttonDir.South || this.direction == buttonDir.North)
                 {
-                    this.setEl(curvel * dirMul);
+                    Program.state.commandElevationRate = curvel * dirMul;
+                    Program.state.command = CommandType.Jog;
+                    Program.state.go.Set();
                     Thread.Sleep(500);
-                    this.setEl(0.0);
+                    Program.state.command = CommandType.Stop;
+                    Program.state.go.Set();
                 }
                 else
                 {
-                    this.setAz(curvel * dirMul);
+                    Program.state.commandAzimuthRate = curvel * dirMul;
+                    Program.state.command = CommandType.Jog;
+                    Program.state.go.Set();
                     Thread.Sleep(500);
-                    this.setAz(0.0);
+                    Program.state.command = CommandType.Stop;
+                    Program.state.go.Set();
                 }
-                state = DishState.Stopped;
+                Program.state.state = DishState.Stopped;
                 updateStatus();
                 jogEvent.Reset();
             }
@@ -133,7 +142,7 @@ namespace DishControl
         {
             lunarTrack.Enabled = dev.Connected;
 
-            bool bEnabled = dev.Connected && !trackMoon && state != DishState.Moving;
+            bool bEnabled = dev.Connected && !trackMoon && Program.state.state != DishState.Moving;
 
             commandAz.Enabled = bEnabled;
             commandEl.Enabled = bEnabled;
@@ -154,16 +163,16 @@ namespace DishControl
                 commandDec.Enabled = false;
             }
 
-            Park.Enabled = (state == DishState.Stopped);
-            GO.Enabled = (state == DishState.Stopped);
+            Park.Enabled = (Program.state.state == DishState.Stopped);
+            GO.Enabled = (Program.state.state == DishState.Stopped);
 
-            STOP.Enabled = (state != DishState.Stopped && state != DishState.Unknown);
+            STOP.Enabled = (Program.state.state != DishState.Stopped && Program.state.state != DishState.Unknown);
         }
         
         //update status indicators
         private void updateStatus()
         {
-            if (dev.Connected)
+            if (Program.state.connected)
             {
                 connectedIcon.BackColor = Color.Green;
                 connect.Enabled = false;
@@ -174,8 +183,8 @@ namespace DishControl
                 connect.Enabled = true;
             }
 
-            movingIcon.BackColor = (state == DishState.Unknown) ? Color.Yellow : (state == DishState.Stopped ? Color.Green : Color.Red);
-            trackingIcon.BackColor = (state == DishState.Tracking) ? Color.Blue : Color.White;
+            movingIcon.BackColor = (Program.state.state == DishState.Unknown) ? Color.Yellow : (Program.state.state == DishState.Stopped ? Color.Green : Color.Red);
+            trackingIcon.BackColor = (Program.state.state == DishState.Tracking) ? Color.Blue : Color.White;
         }
 
         //called when connect button clicked
@@ -460,19 +469,19 @@ namespace DishControl
 
         private void MainForm_Shown(object sender, EventArgs e)
         {
-            Connect();
+//            Connect();
             updateStatus();
             updatePosition();
         }
 
         private void Stop()
         {
-            azPid.Disable();
-            elPid.Disable();
-            this.setAz(0.0);
-            this.setEl(0.0);
-            this.state = DishState.Stopped;
-            bUpdating = false;
+            //azPid.Disable();
+            //elPid.Disable();
+            //this.setAz(0.0);
+            //this.setEl(0.0);
+            //this.state = DishState.Stopped;
+            //bUpdating = false;
         }
         private void Up_Click(object sender, EventArgs e)
         {
@@ -500,10 +509,10 @@ namespace DishControl
 
         private void SouthPark_Click(object sender, EventArgs e)
         {
-            azCommand = settings.azSouthPark;
-            elCommand = settings.elSouthPark;
-            GeoAngle mAzAngle = GeoAngle.FromDouble(azCommand, true);
-            GeoAngle mElAngle = GeoAngle.FromDouble(elCommand);
+            Program.state.commandAzimuth = settings.azSouthPark;
+            Program.state.commandElevation = settings.elSouthPark;
+            GeoAngle mAzAngle = GeoAngle.FromDouble(Program.state.commandAzimuth, true);
+            GeoAngle mElAngle = GeoAngle.FromDouble(Program.state.commandElevation);
             this.commandAz.Text = string.Format("{0} : {1}", mAzAngle.Degrees, mAzAngle.Minutes);
             this.commandEl.Text = string.Format("{0} : {1}", mElAngle.Degrees, mElAngle.Minutes);
 
@@ -514,10 +523,11 @@ namespace DishControl
             this.commandRA.Text = string.Format("{0:D3} : {1:D2}", RA.Degrees, RA.Minutes);
             this.commandDec.Text = string.Format("{0:D2} : {1:D2}", Dec.Degrees, Dec.Minutes);
 
-            this.state = DishState.Parking; ;
+            Program.state.state = DishState.Parking;
+            Program.state.go.Set();
 
-            azPid.Enable();
-            elPid.Enable();
+            //azPid.Enable();
+            //elPid.Enable();
         }
     }
 }

@@ -22,6 +22,7 @@ namespace DishControl
             Eth32 dev = new Eth32();
 #endif
             state = new SharedState();
+            MainMotion motion = new MainMotion(dev);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new MainForm(dev));

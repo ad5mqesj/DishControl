@@ -19,6 +19,8 @@ namespace DishControl
         configModel settings;
         Eth32 dev = null;
         Thread updateThread = null;
+        Thread moveEventThread = null;
+        Thread configEventThread = null;
         Encoder azEncoder = null, elEncoder = null;
         double azCommand = -1.0, elCommand, RAcommand, decCommand;
         bool azForward = true;
@@ -28,13 +30,13 @@ namespace DishControl
         int outputPortNum = 2;
         int WatchdoLoopcount = 0;
         int currentIncrement = 0;
-        private delegate void TimerEventDel();
-        bool btEnabled = true;
         int TimerTickms = 10;
 
         public MainMotion (Eth32 dev)
         {
             this.dev = dev;
+            this.moveEventThread = new Thread(moveEventHandler);
+            this.configEventThread = new Thread(configEventHandler);
         }
 
         //called to set up motion control sepcific objects: encoder reader class, and PID loops for each axis
@@ -61,6 +63,49 @@ namespace DishControl
             //set up thread for watchdog
             this.updateThread = new Thread(updateThreadCallback);
             this.updateThread.Priority = ThreadPriority.Highest;
+        }
+
+        //waits for signal to indicate we have a (new) config and should (re-)connect
+        private void configEventHandler()
+        {
+            while (Program.state.btEnabled) //while not exiting
+            {
+                Program.state.connectEvent.WaitOne();
+                if (!Program.state.btEnabled)           //bail if exit signal is set
+                    return;
+                if (Program.state.appConfigured)
+                    Connect();
+                else
+                {
+                    if (dev.Connected)
+                        dev.Disconnect();
+                }
+                Program.state.connectEvent.Reset();
+            }
+        }
+
+        //waits for signal from UI that it wants to command a motion
+        private void moveEventHandler()
+        {
+            while(Program.state.btEnabled)
+            {
+                Program.state.go.WaitOne();
+                if (!Program.state.btEnabled) //bail if exit signal is set
+                    return;
+                switch (Program.state.command)
+                {
+                    case CommandType.Jog:
+                        break;
+                    case CommandType.Move:
+                        break;
+                    case CommandType.Stop:
+                        Program.state.commandAzimuthRate = 0.0;
+                        Program.state.commandElevationRate = 0.0;
+                        this.Stop();
+                        break;
+                }
+                Program.state.go.Reset();
+            }
         }
 
         //called to establish network connection to Eth32 box
@@ -345,17 +390,25 @@ namespace DishControl
 
         }
 
+        private void Stop()
+        {
+            azPid.Disable();
+            elPid.Disable();
+            this.setAz(0.0);
+            this.setEl(0.0);
+            Program.state.state = DishState.Stopped;
+        }
+
         //this is Thread callback actual thread handler for the watchdog timer
         //similar to button thread
         private void updateThreadCallback()
         {
-            while (btEnabled)
+            while (Program.state.btEnabled)
             {
                 Thread.Sleep(TimerTickms);
-                if (!btEnabled)
+                if (!Program.state.btEnabled || !dev.Connected)
                     return;
-                if (bRunTick && this.IsHandleCreated)
-                    BeginInvoke(new TimerEventDel(timer_Tick));
+                timer_Tick();
             }
         }
 
@@ -373,7 +426,7 @@ namespace DishControl
 
             if (WatchdoLoopcount == 0)
             {
-                if (dev.Connected && state == DishState.Stopped)
+                if (dev.Connected && Program.state.state == DishState.Stopped)
                 {
                     if (azCommand == -1.0)
                     {
@@ -388,15 +441,22 @@ namespace DishControl
                     {
                         azCommand = azPos;
                         elCommand = elPos;
-                        GeoAngle mAzAngle = GeoAngle.FromDouble(azCommand, true);
-                        GeoAngle mElAngle = GeoAngle.FromDouble(elCommand);
-                        this.commandAz.Text = string.Format("{0} : {1}", mAzAngle.Degrees, mAzAngle.Minutes);
-                        this.commandEl.Text = string.Format("{2}{0} : {1}", mElAngle.Degrees, mElAngle.Minutes, mElAngle.IsNegative ? "-" : "");
+                        Program.state.commandAzimuth = azCommand;
+                        Program.state.commandElevation = elCommand;
+                        //GeoAngle mAzAngle = GeoAngle.FromDouble(azCommand, true);
+                        //GeoAngle mElAngle = GeoAngle.FromDouble(elCommand);
+                        //this.commandAz.Text = string.Format("{0} : {1}", mAzAngle.Degrees, mAzAngle.Minutes);
+                        //this.commandEl.Text = string.Format("{2}{0} : {1}", mElAngle.Degrees, mElAngle.Minutes, mElAngle.IsNegative ? "-" : "");
+                    }
+                    lock (Program.state)
+                    {
+                        Program.state.azimuth = azPos;
+                        Program.state.elevation = elPos;
                     }
                 }
             }
 
-            if (state != DishState.Stopped && state != DishState.Unknown)
+            if (Program.state.state != DishState.Stopped && Program.state.state != DishState.Unknown)
             {
                 if (azPid.Complete && elPid.Complete)
                 {
