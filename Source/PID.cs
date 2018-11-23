@@ -151,6 +151,7 @@ namespace PIDLibrary
             runThread.Priority = ThreadPriority.Highest;
             runThread.Name = "PID Processor";
             inMotion = true;
+            motionComplete = false;
             runThread.Start();
         }
 
@@ -159,7 +160,8 @@ namespace PIDLibrary
             if (runThread == null)
                 return;
 
-            inMotion = true;
+            inMotion = false;
+            motionComplete = true;
             runThread.Abort();
             runThread = null;
         }
@@ -168,8 +170,8 @@ namespace PIDLibrary
         {
             errSum = 0.0f;
             lastUpdate = DateTime.Now.Ticks;
-            motionComplete = false;
-            inMotion = true;
+            motionComplete = true;
+            inMotion = false;
         }
 
         #endregion

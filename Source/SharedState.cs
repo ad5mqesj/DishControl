@@ -35,6 +35,8 @@ namespace DishControl
 
         public double commandAzimuth { get; set; }
         public double commandElevation { get; set; }
+        public double commandRightAscension { get; set; }
+        public double commandDeclination { get; set; }
 
         public double commandAzimuthRate { get; set; }
         public double commandElevationRate { get; set; }

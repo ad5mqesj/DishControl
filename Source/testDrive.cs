@@ -31,10 +31,10 @@ namespace DishControl
             this.settings = settings;
             this.form = main;
 
-            this.azPos = this.form.azReadPosition();
-            this.elPos = this.form.elReadPosition();
-            this.form.setAz(0.0);
-            this.form.setEl(0.0);
+            this.azPos = Program.state.azimuth;
+            this.elPos = Program.state.elevation;
+            Program.state.command = CommandType.Stop;
+            Program.state.go.Set();
 
             InitializeComponent();
             this.azimuth.Text =  String.Format("{0:0.00}",this.azPos);
@@ -77,15 +77,18 @@ namespace DishControl
         private void goEl_Click(object sender, EventArgs e)
         {
             timer.Start();
-            this.form.setEl(this.elVelCmd);
+            Program.state.commandElevationRate = this.elVelCmd;
+            Program.state.commandAzimuthRate = 0.0;
+            Program.state.command = CommandType.Jog;
+            Program.state.go.Set();
         }
 
         private void stop_Click(object sender, EventArgs e)
         {
             if (timer != null && timer.Enabled)
                 timer.Stop();
-            this.form.setAz(0.0);
-            this.form.setEl(0.0);
+            Program.state.command = CommandType.Stop;
+            Program.state.go.Set();
         }
 
         private void refresh_Click(object sender, EventArgs e)
@@ -105,12 +108,15 @@ namespace DishControl
         private void goAz_Click(object sender, EventArgs e)
         {
             timer.Start();
-            this.form.setAz(this.azVelCmd);
+            Program.state.commandElevationRate = 0.0;
+            Program.state.commandAzimuthRate = this.azVelCmd;
+            Program.state.command = CommandType.Jog;
+            Program.state.go.Set();
         }
         private void timer1_Tick(object sender, EventArgs e)
         {
-            this.azimuth.Text = String.Format("0:0.00", this.form.azPos);
-            this.elevation.Text = String.Format("0:0.00", this.form.elPos);
+            this.azimuth.Text = String.Format("0:0.00", Program.state.azimuth);
+            this.elevation.Text = String.Format("0:0.00", Program.state.elevation);
         }
 
     }

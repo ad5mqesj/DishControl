@@ -205,7 +205,6 @@ namespace DishControl
             messages.Enqueue(args.Message.MessageType + ": " + args.Message.ToString());
             if (messages.Count > 100) messages.Dequeue(); //Keep message queue at 100
 
-            NmeaParser.Nmea.Gps.Gpgll gll;
             NmeaParser.Nmea.Gps.Gpgga gga;
             NmeaParser.Nmea.Gps.Garmin.Pgrme rme;
             IEnumerable<NmeaParser.Nmea.Gps.Gpgsv> gpgsvParts;

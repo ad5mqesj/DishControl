@@ -9,7 +9,9 @@ namespace DishControl
 {
     static class Program
     {
-        public static SharedState state; 
+        public static SharedState state;
+        public static configModel settings;
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>

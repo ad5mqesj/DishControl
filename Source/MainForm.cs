@@ -27,17 +27,13 @@ namespace DishControl
     public partial class MainForm : Form
     {
         Eth32 dev = null;
-        configModel settings;
         System.Windows.Forms.Timer mainTimer = null;
-        bool bRunTick = false;
-        bool trackCelestial = false;
-        bool trackMoon = false;
-        bool bUpdating = false;
         DateTime messageTime = DateTime.Now;
         Thread buttonThread;
         ManualResetEvent jogEvent;
         buttonDir direction;
         List<presets> Presets = null;
+        int currentIncrement = 0;
 
         public MainForm(Eth32 dev)
         {
@@ -53,14 +49,14 @@ namespace DishControl
             string configFile = Application.StartupPath + "\\dishConfig.xml";
             if (File.Exists(configFile))
             {
-                settings = configFileHandler.readConfig(configFile);
+                Program.settings = configFileHandler.readConfig(configFile);
                 Program.state.appConfigured = true;
                 Program.state.connectEvent.Set();
             }//if config exists
             else
             {
-                settings = new configModel();
-                Config cfgDialog = new Config(dev, this.settings);
+                Program.settings = new configModel();
+                Config cfgDialog = new Config(dev, Program.settings);
                 if (cfgDialog.ShowDialog() == DialogResult.OK)
                 {
                     configFileHandler.writeConfig(configFile, cfgDialog.settings);
@@ -76,7 +72,7 @@ namespace DishControl
             if (Program.state.appConfigured)
             {
                 //get presets array
-                Presets = settings.getPresetList();
+                Presets = Program.settings.getPresetList();
                 foreach (presets p in Presets)
                 {
                     if (!String.IsNullOrEmpty(p.Text))
@@ -85,7 +81,7 @@ namespace DishControl
                     }
                 }
                 presetSelector.SelectedIndex = 0;
-                RollingLogger.setupRollingLogger(settings.positionFileLog, settings.maxPosLogSizeBytes, settings.maxPosLogFiles);
+                RollingLogger.setupRollingLogger(Program.settings.positionFileLog, Program.settings.maxPosLogSizeBytes, Program.settings.maxPosLogFiles);
                 //we are configured so signal the Connect event so main motion can connect hardware
                 Program.state.connectEvent.Set();
             }//if config exists
@@ -106,7 +102,7 @@ namespace DishControl
                     jogEvent.Reset();
                     continue;
                 }
-                double curvel = this.settings.jogIncrement;
+                double curvel = Program.settings.jogIncrement;
                 double dirMul = 1.0;
                 if (this.direction == buttonDir.South || this.direction == buttonDir.East)
                     dirMul = -1.0;
@@ -142,7 +138,7 @@ namespace DishControl
         {
             lunarTrack.Enabled = dev.Connected;
 
-            bool bEnabled = dev.Connected && !trackMoon && Program.state.state != DishState.Moving;
+            bool bEnabled = dev.Connected && !Program.state.trackMoon && Program.state.state != DishState.Moving;
 
             commandAz.Enabled = bEnabled;
             commandEl.Enabled = bEnabled;
@@ -150,9 +146,9 @@ namespace DishControl
             commandDec.Enabled = bEnabled;
             track.Enabled = bEnabled;
 
-            if (trackCelestial)
+            if (Program.state.trackCelestial)
             {
-                trackMoon = false;
+                Program.state.trackMoon = false;
                 lunarTrack.Enabled = false;
                 commandAz.Enabled = false;
                 commandEl.Enabled = false;
@@ -190,8 +186,7 @@ namespace DishControl
         //called when connect button clicked
         private void connect_Click(object sender, EventArgs e)
         {
-            if (!dev.Connected) 
-                this.Connect();
+            Program.state.connectEvent.Set();
         }
 
         //update position display
@@ -202,18 +197,12 @@ namespace DishControl
                 Message.Text = "";
             }
 
-            //read actual form encoders
-            //if (dev.Connected && state == DishState.Stopped)
-            //{
-            //    azPos = azReadPosition();
-            //    elPos = elReadPosition();
-            //}
             //set up display variables in deg, min, sec format
-            GeoAngle AzAngle = GeoAngle.FromDouble(azPos, true);
-            GeoAngle ElAngle = GeoAngle.FromDouble(elPos);
+            GeoAngle AzAngle = GeoAngle.FromDouble(Program.state.azimuth, true);
+            GeoAngle ElAngle = GeoAngle.FromDouble(Program.state.elevation);
             
             //convert to RA/DEC
-            RaDec astro = celestialConversion.CalcualteRaDec(elPos, azPos, settings.latitude, settings.longitude);
+            RaDec astro = celestialConversion.CalcualteRaDec(Program.state.elevation, Program.state.azimuth, Program.settings.latitude, Program.settings.longitude);
             //set up RA DEC as deg,min,sec
             GeoAngle Dec = GeoAngle.FromDouble(astro.Dec);
             GeoAngle RA = GeoAngle.FromDouble(astro.RA, true);
@@ -238,71 +227,63 @@ namespace DishControl
             //if celestial track is set, check to make sure command position is above horizon if so then enable motion
             //probably have to have a completely seperate velocity track loop here - PID loop may not be satisfactor
             //-----NEEDS TESTING
-            if (trackCelestial)
-            {
-                AltAz aa = celestialConversion.CalculateAltAz(RAcommand, decCommand, settings.latitude, settings.longitude);
-                if (aa.Alt < 0)
-                {
-                    Message.Text = "Requested position is below horizon!";
-                    trackMoon = false;
-                    messageTime = DateTime.Now;
-                    trackCelestial = false;
-                }
-                GeoAngle cAzAngle = GeoAngle.FromDouble(aa.Az, true);
-                GeoAngle cElAngle = GeoAngle.FromDouble(aa.Alt);
-                azCommand = aa.Az;
-                elCommand = aa.Alt;
-                this.commandAz.Text = string.Format("{0:D3} : {1:D2}", cAzAngle.Degrees, cAzAngle.Minutes);
-                this.commandEl.Text = string.Format("{0:D2} : {1:D2}", cElAngle.Degrees, cElAngle.Minutes);
+            //if (trackCelestial)
+            //{
+            //    AltAz aa = celestialConversion.CalculateAltAz(Program.state.commandRightAscension, Program.state.commandDeclination, Program.settings.latitude, Program.settings.longitude);
+            //    if (aa.Alt < 0)
+            //    {
+            //        Message.Text = "Requested position is below horizon!";
+            //        trackMoon = false;
+            //        messageTime = DateTime.Now;
+            //        trackCelestial = false;
+            //    }
+            //    GeoAngle cAzAngle = GeoAngle.FromDouble(aa.Az, true);
+            //    GeoAngle cElAngle = GeoAngle.FromDouble(aa.Alt);
+            //    azCommand = aa.Az;
+            //    elCommand = aa.Alt;
+            //    this.commandAz.Text = string.Format("{0:D3} : {1:D2}", cAzAngle.Degrees, cAzAngle.Minutes);
+            //    this.commandEl.Text = string.Format("{0:D2} : {1:D2}", cElAngle.Degrees, cElAngle.Minutes);
 
-                if (state != DishState.Moving && state != DishState.Tracking && aa.Alt > 1.0)
-                    this.Go();
-            }
+            //    if (state != DishState.Moving && state != DishState.Tracking && aa.Alt > 1.0)
+            //        this.Go();
+            //}
 
 
-            //if Lunar track is set, check to make sure Moon position is above horizon if so then enable motion
-            //probably have to have a completely seperate velocity track loop here - PID loop may not be satisfactor
-            //-----NEEDS TESTING
-            if (trackMoon)
-            {
-                SunCalc sc = new SunCalc();
-                long eDate = sc.epochDate(DateTime.UtcNow);
-                double jdate = sc.toJulian(eDate);
-                AltAz aa = sc.getMoonPosition(eDate, settings.latitude, settings.longitude);
-                if (aa.Alt < 0)
-                {
-                    Message.Text = "Moon is below horizon!";
-                    trackMoon = false;
-                    messageTime = DateTime.Now;
-                }
-                moonRiseSet mrs = sc.getMoonTimes(eDate, settings.latitude, settings.longitude, true);
-                azCommand = aa.Az;
-                elCommand = aa.Alt;
-                GeoAngle mAzAngle = GeoAngle.FromDouble(aa.Az, true);
-                GeoAngle mElAngle = GeoAngle.FromDouble(aa.Alt);
-                this.commandAz.Text = string.Format("{0} : {1}", mAzAngle.Degrees, mAzAngle.Minutes);
-                this.commandEl.Text = string.Format("{2}{0} : {1}", mElAngle.Degrees, mElAngle.Minutes, mElAngle.IsNegative ? "-" : "");
+            ////if Lunar track is set, check to make sure Moon position is above horizon if so then enable motion
+            ////probably have to have a completely seperate velocity track loop here - PID loop may not be satisfactor
+            ////-----NEEDS TESTING
+            //if (trackMoon)
+            //{
+            //    SunCalc sc = new SunCalc();
+            //    long eDate = sc.epochDate(DateTime.UtcNow);
+            //    double jdate = sc.toJulian(eDate);
+            //    AltAz aa = sc.getMoonPosition(eDate, Program.settings.latitude, Program.settings.longitude);
+            //    if (aa.Alt < 0)
+            //    {
+            //        Message.Text = "Moon is below horizon!";
+            //        trackMoon = false;
+            //        messageTime = DateTime.Now;
+            //    }
+            //    moonRiseSet mrs = sc.getMoonTimes(eDate, Program.settings.latitude, Program.settings.longitude, true);
+            //    azCommand = aa.Az;
+            //    elCommand = aa.Alt;
+            //    GeoAngle mAzAngle = GeoAngle.FromDouble(aa.Az, true);
+            //    GeoAngle mElAngle = GeoAngle.FromDouble(aa.Alt);
+            //    this.commandAz.Text = string.Format("{0} : {1}", mAzAngle.Degrees, mAzAngle.Minutes);
+            //    this.commandEl.Text = string.Format("{2}{0} : {1}", mElAngle.Degrees, mElAngle.Minutes, mElAngle.IsNegative ? "-" : "");
 
-                double Alt = elCommand;
-                if (Alt > 90.0) Alt = Alt - 90.0;
-                RaDec mastro = celestialConversion.CalcualteRaDec(Alt, azCommand, settings.latitude, settings.longitude);
-                GeoAngle mDec = GeoAngle.FromDouble(mastro.Dec);
-                GeoAngle mRA = GeoAngle.FromDouble(mastro.RA, true);
+            //    double Alt = elCommand;
+            //    if (Alt > 90.0) Alt = Alt - 90.0;
+            //    RaDec mastro = celestialConversion.CalcualteRaDec(Alt, azCommand, Program.settings.latitude, Program.settings.longitude);
+            //    GeoAngle mDec = GeoAngle.FromDouble(mastro.Dec);
+            //    GeoAngle mRA = GeoAngle.FromDouble(mastro.RA, true);
 
-                this.commandRA.Text = string.Format("{0:D3} : {1:D2}", mRA.Degrees, mRA.Minutes);
-                this.commandDec.Text = string.Format("{0:D2} : {1:D2}", mDec.Degrees, mDec.Minutes);
-                if (state != DishState.Moving && state != DishState.Tracking && aa.Alt > 1.0)
-                    this.Go();
-            }//trackMoon
+            //    this.commandRA.Text = string.Format("{0:D3} : {1:D2}", mRA.Degrees, mRA.Minutes);
+            //    this.commandDec.Text = string.Format("{0:D2} : {1:D2}", mDec.Degrees, mDec.Minutes);
+            //    if (state != DishState.Moving && state != DishState.Tracking && aa.Alt > 1.0)
+            //        this.Go();
+            //}//trackMoon
 
-            //send stop command if we have to here
-            if (state != DishState.Stopped && state != DishState.Unknown)
-            {
-                if (azPid.Complete && elPid.Complete)
-                {
-                    this.Stop();
-                }
-            }
         }
 
         //this is the sloppy Forms timer that controls UI update
@@ -317,78 +298,69 @@ namespace DishControl
         {
             if (dev != null)
             {
-                this.enableDrive(false);
                 if (mainTimer != null)
                     mainTimer.Stop();
-                bRunTick = false;
-                btEnabled = false;
+                Program.state.btEnabled = false;
                 jogEvent.Set();
-
-                // dev is at least instantiated
-                if (dev.Connected)
-                {
-                    dev.Disconnect();
-                }
+                Thread.Sleep(50);
+                Program.state.command = CommandType.Stop;
+                Program.state.go.Set();
+                Thread.Sleep(250);
+                Program.state.appConfigured = false;
+                Program.state.connectEvent.Set();
+                Thread.Sleep(250);
             }
 
         }
 
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string startingIP = settings.eth32Address;
+            string startingIP = Program.settings.eth32Address;
             this.Stop();
             mainTimer.Stop();
-            updateThread.Abort();
-            Config cfgDialog = new Config(dev, this.settings);
+            Program.state.appConfigured = false;
+            Program.state.connectEvent.Set();
+
+            Config cfgDialog = new Config(dev, Program.settings);
             if (cfgDialog.ShowDialog() == DialogResult.OK)
             {
                 string configFile = Application.StartupPath + "\\dishConfig.xml";
                 configFileHandler.writeConfig(configFile, cfgDialog.settings);
-                RollingLogger.setupRollingLogger(settings.positionFileLog, settings.maxPosLogSizeBytes, settings.maxPosLogFiles);
+                RollingLogger.setupRollingLogger(Program.settings.positionFileLog, Program.settings.maxPosLogSizeBytes, Program.settings.maxPosLogFiles);
                 MessageBox.Show("Saved");
-                appConfigured = true;
+                Program.state.appConfigured = true;
+                Program.state.connectEvent.Set();
             }
-            if (appConfigured)
-            {
-                string resultString = Regex.Match(settings.outputPort, @"\d+").Value;
-                Int32.TryParse(resultString, out outputPortNum);
-
-
-                azEncoder = new Encoder(this.dev, this.settings, true);
-                elEncoder = new Encoder(this.dev, this.settings, false);
-
-                Connect(startingIP.Equals(settings.eth32Address));
-            }
-        }
+         }
 
         private void track_CheckedChanged(object sender, EventArgs e)
         {
-            trackCelestial = track.Checked;
+            Program.state.trackCelestial = track.Checked;
         }
 
         private void commandRA_TextChanged(object sender, EventArgs e)
         {
-            RAcommand = GeoAngle.FromString(commandRA.Text).ToDouble();
+            Program.state.commandRightAscension = GeoAngle.FromString(commandRA.Text).ToDouble();
         }
 
         private void commandDec_TextChanged(object sender, EventArgs e)
         {
-            decCommand = GeoAngle.FromString(commandDec.Text).ToDouble();
+            Program.state.commandDeclination = GeoAngle.FromString(commandDec.Text).ToDouble();
         }
 
         private void commandEl_TextChanged(object sender, EventArgs e)
         {
-            elCommand = GeoAngle.FromString(commandEl.Text).ToDouble();
+            Program.state.commandElevation = GeoAngle.FromString(commandEl.Text).ToDouble();
         }
 
         private void commandAz_TextChanged(object sender, EventArgs e)
         {
-            azCommand = GeoAngle.FromString(commandAz.Text).ToDouble();
+            Program.state.commandAzimuth = GeoAngle.FromString(commandAz.Text).ToDouble();
         }
 
         private void lunarTrack_Click(object sender, EventArgs e)
         {
-            trackMoon = !trackMoon;
+            Program.state.trackMoon = !Program.state.trackMoon;
         }
 
         private void GO_Click(object sender, EventArgs e)
@@ -398,34 +370,32 @@ namespace DishControl
 
         public void Go()
         {
-            azPid.Enable();
-            elPid.Enable();
-            if (!trackCelestial && !trackMoon)
-                this.state = DishState.Moving;
+            if ((Program.state.trackCelestial || Program.state.trackMoon))
+                Program.state.command = CommandType.Track;
             else
-                this.state = DishState.Tracking;
+                Program.state.command = CommandType.Move;
+            Program.state.go.Set();
         }
 
         private void Park_Click(object sender, EventArgs e)
         {
-            azCommand = settings.azPark;
-            elCommand = settings.elPark;
-            GeoAngle mAzAngle = GeoAngle.FromDouble(azCommand, true);
-            GeoAngle mElAngle = GeoAngle.FromDouble(elCommand);
+            Program.state.commandAzimuth = Program.settings.azPark;
+            Program.state.commandElevation = Program.settings.elPark;
+            GeoAngle mAzAngle = GeoAngle.FromDouble(Program.state.commandAzimuth, true);
+            GeoAngle mElAngle = GeoAngle.FromDouble(Program.state.commandElevation);
             this.commandAz.Text = string.Format("{0} : {1}", mAzAngle.Degrees, mAzAngle.Minutes);
             this.commandEl.Text = string.Format("{0} : {1}", mElAngle.Degrees, mElAngle.Minutes);
 
-            RaDec astro = celestialConversion.CalcualteRaDec(mElAngle.ToDouble(), mAzAngle.ToDouble(), settings.latitude, settings.longitude);
+            RaDec astro = celestialConversion.CalcualteRaDec(mElAngle.ToDouble(), mAzAngle.ToDouble(), Program.settings.latitude, Program.settings.longitude);
             GeoAngle Dec = GeoAngle.FromDouble(astro.Dec);
             GeoAngle RA = GeoAngle.FromDouble(astro.RA, true);
 
             this.commandRA.Text = string.Format("{0:D3} : {1:D2}", RA.Degrees, RA.Minutes);
             this.commandDec.Text = string.Format("{0:D2} : {1:D2}", Dec.Degrees, Dec.Minutes);
 
-            this.state = DishState.Parking; ;
-
-            azPid.Enable();
-            elPid.Enable();
+            Program.state.state = DishState.Parking; ;
+            Program.state.command = CommandType.Move;
+            Program.state.go.Set();
         }
 
         private void STOP_Click(object sender, EventArgs e)
@@ -435,7 +405,7 @@ namespace DishControl
 
         private void driveTestToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            testDrive testDialog = new testDrive(dev, this.settings, this);
+            testDrive testDialog = new testDrive(dev, Program.settings, this);
             testDialog.ShowDialog();
 
         }
@@ -445,14 +415,14 @@ namespace DishControl
             int item = presetSelector.SelectedIndex;
             if (item != 0)
             {
-                this.azCommand = this.Presets[item].Az;
-                this.elCommand = this.Presets[item].El;
-                GeoAngle mAzAngle = GeoAngle.FromDouble(azCommand, true);
-                GeoAngle mElAngle = GeoAngle.FromDouble(elCommand);
+                Program.state.commandAzimuth = this.Presets[item].Az;
+                Program.state.commandElevation = this.Presets[item].El;
+                GeoAngle mAzAngle = GeoAngle.FromDouble(Program.state.commandAzimuth, true);
+                GeoAngle mElAngle = GeoAngle.FromDouble(Program.state.commandElevation);
                 this.commandAz.Text = string.Format("{0} : {1}", mAzAngle.Degrees, mAzAngle.Minutes);
                 this.commandEl.Text = string.Format("{0} : {1}", mElAngle.Degrees, mElAngle.Minutes);
 
-                RaDec astro = celestialConversion.CalcualteRaDec(mElAngle.ToDouble(), mAzAngle.ToDouble(), settings.latitude, settings.longitude);
+                RaDec astro = celestialConversion.CalcualteRaDec(mElAngle.ToDouble(), mAzAngle.ToDouble(), Program.settings.latitude, Program.settings.longitude);
                 GeoAngle Dec = GeoAngle.FromDouble(astro.Dec);
                 GeoAngle RA = GeoAngle.FromDouble(astro.RA, true);
 
@@ -469,19 +439,14 @@ namespace DishControl
 
         private void MainForm_Shown(object sender, EventArgs e)
         {
-//            Connect();
             updateStatus();
             updatePosition();
         }
 
         private void Stop()
         {
-            //azPid.Disable();
-            //elPid.Disable();
-            //this.setAz(0.0);
-            //this.setEl(0.0);
-            //this.state = DishState.Stopped;
-            //bUpdating = false;
+            Program.state.command = CommandType.Stop;
+            Program.state.go.Set();
         }
         private void Up_Click(object sender, EventArgs e)
         {
@@ -509,14 +474,14 @@ namespace DishControl
 
         private void SouthPark_Click(object sender, EventArgs e)
         {
-            Program.state.commandAzimuth = settings.azSouthPark;
-            Program.state.commandElevation = settings.elSouthPark;
+            Program.state.commandAzimuth = Program.settings.azSouthPark;
+            Program.state.commandElevation = Program.settings.elSouthPark;
             GeoAngle mAzAngle = GeoAngle.FromDouble(Program.state.commandAzimuth, true);
             GeoAngle mElAngle = GeoAngle.FromDouble(Program.state.commandElevation);
             this.commandAz.Text = string.Format("{0} : {1}", mAzAngle.Degrees, mAzAngle.Minutes);
             this.commandEl.Text = string.Format("{0} : {1}", mElAngle.Degrees, mElAngle.Minutes);
 
-            RaDec astro = celestialConversion.CalcualteRaDec(mElAngle.ToDouble(), mAzAngle.ToDouble(), settings.latitude, settings.longitude);
+            RaDec astro = celestialConversion.CalcualteRaDec(mElAngle.ToDouble(), mAzAngle.ToDouble(), Program.settings.latitude, Program.settings.longitude);
             GeoAngle Dec = GeoAngle.FromDouble(astro.Dec);
             GeoAngle RA = GeoAngle.FromDouble(astro.RA, true);
 
@@ -526,8 +491,8 @@ namespace DishControl
             Program.state.state = DishState.Parking;
             Program.state.go.Set();
 
-            //azPid.Enable();
-            //elPid.Enable();
+            Program.state.command = CommandType.Move;
+            Program.state.go.Set();
         }
     }
 }
