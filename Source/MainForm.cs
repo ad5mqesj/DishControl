@@ -83,6 +83,11 @@ namespace DishControl
                 RollingLogger.setupRollingLogger(Program.settings.positionFileLog, Program.settings.maxPosLogSizeBytes, Program.settings.maxPosLogFiles);
                 //we are configured so signal the Connect event so main motion can connect hardware
                 Program.state.connectEvent.Set();
+                mainTimer = new System.Windows.Forms.Timer();
+                mainTimer.Interval = 150;
+                mainTimer.Enabled = true;
+                mainTimer.Tick += new EventHandler(TimerEventProcessor);
+
             }//if config exists
         }
 
@@ -239,40 +244,6 @@ namespace DishControl
             }
 
 
-            ////if Lunar track is set, check to make sure Moon position is above horizon if so then enable motion
-            ////probably have to have a completely seperate velocity track loop here - PID loop may not be satisfactor
-            ////-----NEEDS TESTING
-            //if (trackMoon)
-            //{
-            //    SunCalc sc = new SunCalc();
-            //    long eDate = sc.epochDate(DateTime.UtcNow);
-            //    double jdate = sc.toJulian(eDate);
-            //    AltAz aa = sc.getMoonPosition(eDate, Program.settings.latitude, Program.settings.longitude);
-            //    if (aa.Alt < 0)
-            //    {
-            //        Message.Text = "Moon is below horizon!";
-            //        trackMoon = false;
-            //        messageTime = DateTime.Now;
-            //    }
-            //    moonRiseSet mrs = sc.getMoonTimes(eDate, Program.settings.latitude, Program.settings.longitude, true);
-            //    azCommand = aa.Az;
-            //    elCommand = aa.Alt;
-            //    GeoAngle mAzAngle = GeoAngle.FromDouble(aa.Az, true);
-            //    GeoAngle mElAngle = GeoAngle.FromDouble(aa.Alt);
-            //    this.commandAz.Text = string.Format("{0} : {1}", mAzAngle.Degrees, mAzAngle.Minutes);
-            //    this.commandEl.Text = string.Format("{2}{0} : {1}", mElAngle.Degrees, mElAngle.Minutes, mElAngle.IsNegative ? "-" : "");
-
-            //    double Alt = elCommand;
-            //    if (Alt > 90.0) Alt = Alt - 90.0;
-            //    RaDec mastro = celestialConversion.CalcualteRaDec(Alt, azCommand, Program.settings.latitude, Program.settings.longitude);
-            //    GeoAngle mDec = GeoAngle.FromDouble(mastro.Dec);
-            //    GeoAngle mRA = GeoAngle.FromDouble(mastro.RA, true);
-
-            //    this.commandRA.Text = string.Format("{0:D3} : {1:D2}", mRA.Degrees, mRA.Minutes);
-            //    this.commandDec.Text = string.Format("{0:D2} : {1:D2}", mDec.Degrees, mDec.Minutes);
-            //    if (state != DishState.Moving && state != DishState.Tracking && aa.Alt > 1.0)
-            //        this.Go();
-            //}//trackMoon
 
         }
 
@@ -320,6 +291,7 @@ namespace DishControl
                 MessageBox.Show("Saved");
                 Program.state.appConfigured = true;
                 Program.state.connectEvent.Set();
+                mainTimer.Start();
             }
         }
 

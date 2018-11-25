@@ -28,13 +28,15 @@ namespace DishControl
         PID elPid = null;
         int outputPortNum = 2;
         int WatchdoLoopcount = 0;
-        int TimerTickms = 10;
+        int TimerTickms = 5;
 
-        public MainMotion (Eth32 dev)
+        public MainMotion(Eth32 dev)
         {
             this.dev = dev;
             this.moveEventThread = new Thread(moveEventHandler);
+            this.moveEventThread.Start();
             this.configEventThread = new Thread(configEventHandler);
+            this.configEventThread.Start();
         }
 
         //called to set up motion control sepcific objects: encoder reader class, and PID loops for each axis
@@ -85,7 +87,7 @@ namespace DishControl
         //waits for signal from UI that it wants to command a motion
         private void moveEventHandler()
         {
-            while(Program.state.btEnabled)
+            while (Program.state.btEnabled)
             {
                 Program.state.go.WaitOne();
                 if (!Program.state.btEnabled) //bail if exit signal is set
@@ -456,7 +458,7 @@ namespace DishControl
 
             if (WatchdoLoopcount == 0)
             {
-                if (dev.Connected && Program.state.state == DishState.Stopped)
+                if (dev.Connected)
                 {
                     if (azCommand == -1.0)
                     {
@@ -467,7 +469,7 @@ namespace DishControl
                     }
                     azPos = azReadPosition();
                     elPos = elReadPosition();
-                    if (azCommand == -1.0)
+                    if (Program.state.state == DishState.Stopped && azCommand == -1.0)
                     {
                         azCommand = azPos;
                         elCommand = elPos;
@@ -475,8 +477,8 @@ namespace DishControl
                         Program.state.commandElevation = elCommand;
                     }
                 }
-                azPos = azReadPosition();
-                elPos = elReadPosition();
+                //                azPos = azReadPosition();
+                //                elPos = elReadPosition();
                 lock (Program.state)
                 {
                     Program.state.azimuth = azPos;
