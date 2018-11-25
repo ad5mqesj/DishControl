@@ -100,6 +100,10 @@ namespace DishControl
 
                     case CommandType.Move:
                         Program.state.state = DishState.Moving;
+                        if (Program.state.raDecCommand)
+                        {
+                            computeAzElCommandFromRaDec();
+                        }
                         lock (Program.state)
                         {
                             azCommand = Program.state.commandAzimuth;
@@ -119,6 +123,19 @@ namespace DishControl
                 }
                 Program.state.go.Reset();
             }
+        }
+
+        private void computeAzElCommandFromRaDec()
+        {
+            AltAz aa = celestialConversion.CalculateAltAz(Program.state.commandRightAscension, Program.state.commandDeclination, Program.settings.latitude, Program.settings.longitude);
+            if (aa.Alt < 0)
+            {
+                Program.state.errorMessage = "Target is below horizon!";
+                Program.state.trackCelestial = false;
+                Program.state.trackMoon = false;
+            }
+            Program.state.commandAzimuth = aa.Az;
+            Program.state.commandElevation = aa.Alt;
         }
 
         //called to establish network connection to Eth32 box
@@ -456,15 +473,25 @@ namespace DishControl
                         elCommand = elPos;
                         Program.state.commandAzimuth = azCommand;
                         Program.state.commandElevation = elCommand;
-                        //GeoAngle mAzAngle = GeoAngle.FromDouble(azCommand, true);
-                        //GeoAngle mElAngle = GeoAngle.FromDouble(elCommand);
-                        //this.commandAz.Text = string.Format("{0} : {1}", mAzAngle.Degrees, mAzAngle.Minutes);
-                        //this.commandEl.Text = string.Format("{2}{0} : {1}", mElAngle.Degrees, mElAngle.Minutes, mElAngle.IsNegative ? "-" : "");
                     }
-                    lock (Program.state)
+                }
+                azPos = azReadPosition();
+                elPos = elReadPosition();
+                lock (Program.state)
+                {
+                    Program.state.azimuth = azPos;
+                    Program.state.elevation = elPos;
+                }
+                if (Program.state.command == CommandType.Track)
+                {
+                    if (Program.state.trackCelestial)
+                        trackCelestialUpdate();
+                    else
+                        trackMoonUpdate();
+                    if (Program.state.trackCelestial || Program.state.trackMoon)
                     {
-                        Program.state.azimuth = azPos;
-                        Program.state.elevation = elPos;
+                        azPid.Enable();
+                        elPid.Enable();
                     }
                 }
             }
@@ -478,6 +505,45 @@ namespace DishControl
             }
         }
 
+        private void trackCelestialUpdate()
+        {
+            computeAzElCommandFromRaDec();
+            if (Program.state.trackCelestial)
+            {
+                lock (Program.state)
+                {
+                    azCommand = Program.state.commandAzimuth;
+                    elCommand = Program.state.commandElevation;
+                }
+            }
+            else //below HORIZON
+                this.Stop();
+        }
+
+        private void trackMoonUpdate()
+        {
+            SunCalc sc = new SunCalc();
+            long eDate = sc.epochDate(DateTime.UtcNow);
+            double jdate = sc.toJulian(eDate);
+            AltAz aa = sc.getMoonPosition(eDate, Program.settings.latitude, Program.settings.longitude);
+            moonRiseSet mrs = sc.getMoonTimes(eDate, Program.settings.latitude, Program.settings.longitude, true);
+            if (aa.Alt < 0.0)
+            {
+                Program.state.errorMessage = "Moon is below horizon!";
+                Program.state.trackCelestial = false;
+                Program.state.trackMoon = false;
+                this.Stop();
+                return;
+            }
+            Program.state.commandAzimuth = aa.Az;
+            Program.state.commandElevation = aa.Alt;
+            lock (Program.state)
+            {
+                azCommand = Program.state.commandAzimuth;
+                elCommand = Program.state.commandElevation;
+            }
+
+        }
 
     }
 }

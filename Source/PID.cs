@@ -253,9 +253,6 @@ namespace PIDLibrary
             //Now we have to scale the output value to match the requested scale
             double outReal = (pTerm + iTerm + dTerm)*gain;
 
-            //outReal = Clamp(outReal, -10.0f, 10.0f);
-            //outReal = ScaleValue(outReal, -10.0f, 10.0f, outMin, outMax);
-
             //Write it out to the world
             outReal = Clamp(outReal, outMin, outMax);
             writeOV(outReal);
@@ -275,7 +272,7 @@ namespace PIDLibrary
                     int sleepTime = (int)(1000 / computeHz);
                     Thread.Sleep(sleepTime);
                     Compute();
-                    if (motionComplete)
+                    if (motionComplete && !(Program.state.trackCelestial||Program.state.trackMoon))
                     {
                         break;
                     }

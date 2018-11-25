@@ -15,6 +15,9 @@ namespace DishControl
             elevation = 0.0;
             commandAzimuth = 0.0;
             commandElevation = 0.0;
+            commandRightAscension = 0.0;
+            commandDeclination = 0.0;
+            raDecCommand = false;
             commandAzimuthRate = 0.0;
             commandElevationRate = 0.0;
             state = DishState.Unknown;
@@ -28,6 +31,8 @@ namespace DishControl
 
             command = CommandType.Unknown;
             go = new ManualResetEvent(false);
+
+            errorMessage = string.Empty;
         }
 
         public double azimuth { get; set; }
@@ -37,6 +42,7 @@ namespace DishControl
         public double commandElevation { get; set; }
         public double commandRightAscension { get; set; }
         public double commandDeclination { get; set; }
+        public bool raDecCommand { get; set; }
 
         public double commandAzimuthRate { get; set; }
         public double commandElevationRate { get; set; }
@@ -54,5 +60,7 @@ namespace DishControl
 
         public CommandType command { get; set; }
         public ManualResetEvent go;
+
+        public string errorMessage { get; set; }
     }
 }
