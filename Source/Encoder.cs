@@ -105,6 +105,65 @@ namespace DishControl
             }
         }
 
+        public uint readEncoderBits()
+        {
+            if (!this.device.Connected)
+                return 0;
+            int[] portData = new int[4];
+
+            int ixb = 0;
+            try
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    if (i == outputPortNum)
+                        continue;
+                    portData[ixb++] = this.device.InputByte(i);
+                }
+            }
+            catch (Exception )
+            {
+
+            }
+            uint data = (uint)(portData[0] & 0xff) | (uint)(portData[1] & 0xff) << 8 | (uint)(portData[2] & 0xff) << 16;
+            return data;
+        }
+
+        public uint NormalizeBits(uint data)
+        {
+            uint retv = 0;
+            uint mask = ((uint)0x00ffffff >> (24 - this.EncoderBits)) << this.StartBit;
+            retv = (data & mask) >> this.StartBit;
+
+            if (this.coding == encoderCode.Grey)
+            {
+                retv = greyToBinary(retv);
+            }
+            int maxRawCounts = (1 << this.EncoderBits) - 1;
+            //check for the need to increment becasue of more than 1 rev per rot
+            if (this.RevsPerRot > 1)
+            {
+                //if we roll over 0 we are still winding up, this assumes we are 
+                //reading at a rate sufficient that we dont accumulate more than 16 counts between reads
+                if (this._lastCount > retv && retv < 16)
+                {
+                    this._rotations++;
+                    if (this._rotations > this.RevsPerRot)
+                        this._rotations = 0;
+                }
+                else if (this._lastCount < retv && retv > maxRawCounts - 16)
+                {
+                    this._rotations--;
+                    if (this._rotations < 0)
+                        this._rotations = 0;
+                }
+            }
+
+            this._lastCount = retv;
+            uint ret = retv + (uint)(this._rotations * maxRawCounts);
+            return ret;
+        }
+
         public uint readNormalizedEncoderBits()
         {
             if (!this.device.Connected)

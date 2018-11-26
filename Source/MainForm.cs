@@ -38,7 +38,7 @@ namespace DishControl
         {
             //set up UI control attributes (auto-generated)
             InitializeComponent();
-
+            this.dev = dev;
             //setup for jog button handler thread, triggering event
             jogEvent = new ManualResetEvent(false);
             this.buttonThread = new Thread(buttonThreadHandler);
@@ -84,8 +84,7 @@ namespace DishControl
                 //we are configured so signal the Connect event so main motion can connect hardware
                 Program.state.connectEvent.Set();
                 mainTimer = new System.Windows.Forms.Timer();
-                mainTimer.Interval = 150;
-                mainTimer.Enabled = true;
+                mainTimer.Interval = 200;
                 mainTimer.Tick += new EventHandler(TimerEventProcessor);
 
             }//if config exists
@@ -259,9 +258,10 @@ namespace DishControl
         {
             if (dev != null)
             {
+                Program.state.btEnabled = false;
                 if (mainTimer != null)
                     mainTimer.Stop();
-                Program.state.btEnabled = false;
+                Thread.Sleep(100);
                 jogEvent.Set();
                 Thread.Sleep(50);
                 Program.state.command = CommandType.Stop;

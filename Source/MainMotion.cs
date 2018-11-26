@@ -28,7 +28,8 @@ namespace DishControl
         PID elPid = null;
         int outputPortNum = 2;
         int WatchdoLoopcount = 0;
-        int TimerTickms = 5;
+        int TimerTickms = 50;
+        uint rawData;
 
         public MainMotion(Eth32 dev)
         {
@@ -47,14 +48,11 @@ namespace DishControl
 
             azEncoder = new Encoder(this.dev, Program.settings, true);
             elEncoder = new Encoder(this.dev, Program.settings, false);
-            //mainTimer = new System.Windows.Forms.Timer();
-            //mainTimer.Tick += new EventHandler(TimerEventProcessor);
-            //mainTimer.Interval = 250;
 
-            azPid = new PID(Program.settings.azKp, Program.settings.azKi, Program.settings.azKd, Program.settings.azG, 360.0, 0.0, Program.settings.azOutMax, Program.settings.azOutMin, this.azReadPosition, this.azSetpoint, this.setAz);
+            azPid = new PID(Program.settings.azKp, Program.settings.azKi, Program.settings.azKd, Program.settings.azG, 360.0, 0.0, Program.settings.azOutMax, Program.settings.azOutMin, this.azPosition, this.azSetpoint, this.setAz);
             azPid.resolution = (Program.settings.azMax - Program.settings.azMin) / (double)((1 << Program.settings.AzimuthEncoderBits) - 1);
 
-            elPid = new PID(Program.settings.elKp, Program.settings.elKi, Program.settings.elKd, Program.settings.elG, 360.0, 0.0, Program.settings.elOutMax, Program.settings.elOutMin, this.elReadPosition, this.elSetpoint, this.setEl);
+            elPid = new PID(Program.settings.elKp, Program.settings.elKi, Program.settings.elKd, Program.settings.elG, 360.0, 0.0, Program.settings.elOutMax, Program.settings.elOutMin, this.elPosition, this.elSetpoint, this.setEl);
             elPid.resolution = (Program.settings.elMax - Program.settings.elMin) / (double)((1 << Program.settings.ElevationEncoderBits) - 1);
 
             azPos = Program.settings.azPark;
@@ -198,6 +196,7 @@ namespace DishControl
 #if !_TEST
                 MessageBox.Show("Error connecting to the ETH32: " + Eth32.ErrorString(etherr.ErrorCode));
 #endif
+                return;
             }
             if (!updateThread.IsAlive)
             {
@@ -239,14 +238,19 @@ namespace DishControl
             {
                 lock (this.dev)
                 {
-                    curval = azEncoder.countsToDegrees(azEncoder.readNormalizedEncoderBits());
+                    rawData = azEncoder.readEncoderBits();
                 }
+                curval = azEncoder.countsToDegrees(azEncoder.NormalizeBits(rawData));
                 this.azPos = LowPass(this.azPos, curval);
             }
             retval = (this.azForward ? this.azPos : this.azPos - 360.0);
             return retval;
         }
 
+        public double azPosition()
+        {
+            return azPos;
+        }
         //read and filter el position, filtered to reduce jitter near bit transitions
         public double elReadPosition()
         {
@@ -254,16 +258,23 @@ namespace DishControl
             double retval;
             if (dev.Connected)
             {
-                lock (this.dev)
-                {
-                    curval = elEncoder.countsToDegrees(elEncoder.readNormalizedEncoderBits());
-                }
+                //lock (this.dev)
+                //{
+                //    curval = elEncoder.countsToDegrees(elEncoder.readNormalizedEncoderBits());
+                //}
+                //assumes that az read is always called first
+                curval = elEncoder.countsToDegrees(elEncoder.NormalizeBits(rawData));
+
                 this.elPos = LowPass(this.elPos, curval);
             }
             retval = this.elPos;
             return retval;
         }
 
+        public double elPosition()
+        {
+            return elPos;
+        }
         //compute shortest path to commanded az position
         public double azSetpoint()
         {
@@ -456,7 +467,7 @@ namespace DishControl
                 this.dev.OutputBit(4, 0, bitState);
             }
 
-            if (WatchdoLoopcount == 0)
+            if (WatchdoLoopcount%2 == 0)
             {
                 if (dev.Connected)
                 {
@@ -477,8 +488,6 @@ namespace DishControl
                         Program.state.commandElevation = elCommand;
                     }
                 }
-                //                azPos = azReadPosition();
-                //                elPos = elReadPosition();
                 lock (Program.state)
                 {
                     Program.state.azimuth = azPos;
