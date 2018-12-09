@@ -86,7 +86,7 @@ namespace DishControl
                 mainTimer = new System.Windows.Forms.Timer();
                 mainTimer.Interval = 200;
                 mainTimer.Tick += new EventHandler(TimerEventProcessor);
-
+                mainTimer.Start();
             }//if config exists
         }
 
@@ -117,6 +117,8 @@ namespace DishControl
                     Program.state.commandElevationRate = curvel * dirMul;
                     Program.state.command = CommandType.Jog;
                     Program.state.go.Set();
+                    while (Program.state.state != DishState.Moving)
+                        Thread.Sleep(10); //wait till we move before timing stop.
                     Thread.Sleep(500);
                     Program.state.command = CommandType.Stop;
                     Program.state.go.Set();
@@ -126,6 +128,8 @@ namespace DishControl
                     Program.state.commandAzimuthRate = curvel * dirMul;
                     Program.state.command = CommandType.Jog;
                     Program.state.go.Set();
+                    while (Program.state.state != DishState.Moving)
+                        Thread.Sleep(10); //wait till we move before timing stop.
                     Thread.Sleep(500);
                     Program.state.command = CommandType.Stop;
                     Program.state.go.Set();
@@ -202,7 +206,7 @@ namespace DishControl
 
             //set up display variables in deg, min, sec format
             GeoAngle AzAngle = GeoAngle.FromDouble(Program.state.azimuth, true);
-            GeoAngle ElAngle = GeoAngle.FromDouble(Program.state.elevation);
+            GeoAngle ElAngle = GeoAngle.FromDouble(Program.state.elevation, true);
 
             //convert to RA/DEC
             RaDec astro = celestialConversion.CalcualteRaDec(Program.state.elevation, Program.state.azimuth, Program.settings.latitude, Program.settings.longitude);
@@ -279,6 +283,7 @@ namespace DishControl
             string startingIP = Program.settings.eth32Address;
             this.Stop();
             mainTimer.Stop();
+            Thread.Sleep(200);
             Program.state.appConfigured = false;
             Program.state.connectEvent.Set();
 

@@ -28,7 +28,7 @@ namespace DishControl
         PID elPid = null;
         int outputPortNum = 2;
         int WatchdoLoopcount = 0;
-        int TimerTickms = 50;
+        int TimerTickms = 10;
         uint rawData;
 
         public MainMotion(Eth32 dev)
@@ -76,7 +76,10 @@ namespace DishControl
                 else
                 {
                     if (dev.Connected)
-                        dev.Disconnect();
+                        lock (dev)
+                        {
+                            dev.Disconnect();
+                        }
                 }
                 Program.state.connectEvent.Reset();
             }
@@ -115,7 +118,8 @@ namespace DishControl
                     case CommandType.Stop:
                         Program.state.commandAzimuthRate = 0.0;
                         Program.state.commandElevationRate = 0.0;
-                        this.Stop();
+                        if (dev.Connected)  
+                            this.Stop();
                         break;
                     case CommandType.Track:
                         Program.state.state = DishState.Tracking;
@@ -449,7 +453,7 @@ namespace DishControl
             while (Program.state.btEnabled)
             {
                 Thread.Sleep(TimerTickms);
-                if (!Program.state.btEnabled || !dev.Connected)
+                if (!Program.state.btEnabled || !dev.Connected || !Program.state.appConfigured)
                     return;
                 timer_Tick();
             }
@@ -462,6 +466,8 @@ namespace DishControl
             if (WatchdoLoopcount > 19)
                 WatchdoLoopcount = 0;
             int bitState = (WatchdoLoopcount) % 5 > 0 ? 1 : 0; //1:5 duty cycle
+            if (!this.dev.Connected)
+                return;
             lock (this.dev)
             {
                 this.dev.OutputBit(4, 0, bitState);
