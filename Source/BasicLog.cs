@@ -45,9 +45,9 @@ namespace DishControl
 
     public class RollingLogger
     {
-        static string LOG_FILE = @"c:\temp\logfile.log";
-        static int MaxRolledLogCount = 3;
-        static int MaxLogSize = 1024; // 1 * 1024 * 1024; <- small value for testing that it works, you can try yourself, and then use a reasonable size, like 1M-10M
+        private static string LOG_FILE = @"c:\temp\logfile.log";
+        private static int MaxRolledLogCount = 3;
+        private static int MaxLogSize = 1024; // 1 * 1024 * 1024; <- small value for testing that it works, you can try yourself, and then use a reasonable size, like 1M-10M
 
         public static void setupRollingLogger(string file, int maxSize, int numFiles)
         {
@@ -60,12 +60,12 @@ namespace DishControl
         {
             lock (LOG_FILE) // lock is optional, but.. should this ever be called by multiple threads, it is safer
             {
-                RollLogFile(LOG_FILE);
                 Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
                 string timeStamp = String.Format("{0:G}  \t",DateTime.UtcNow);
                 try
                 {
                     File.AppendAllText(LOG_FILE, timeStamp + msg + Environment.NewLine, Encoding.UTF8);
+                    RollLogFile(LOG_FILE);
                 }
                 catch (Exception)
                 { }

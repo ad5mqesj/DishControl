@@ -80,6 +80,7 @@ namespace DishControl
                         {
                             dev.Disconnect();
                         }
+                    Program.state.connected = false;
                 }
                 Program.state.connectEvent.Reset();
             }
@@ -156,7 +157,11 @@ namespace DishControl
             {
                 enableDrive(false);
                 Thread.Sleep(1000);
-                dev.Disconnect();
+                lock (dev)
+                {
+                    dev.Disconnect();
+                }
+                Program.state.connected = false;
                 Thread.Sleep(1000);
                 dev = null;
             }
@@ -174,6 +179,7 @@ namespace DishControl
                     Program.state.state = DishState.Stopped;
                     dev.ResetDevice();
                     MotionSetup();
+                    Program.state.connected = true;
 
                     azEncoder.SetupEncoderPorts();
                     elEncoder.SetupEncoderPorts();

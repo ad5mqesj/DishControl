@@ -118,6 +118,7 @@ namespace DishControl
             positionFileLog = "c:\\PositionLogs\\Position.log";
             maxPosLogFiles = 5;
             maxPosLogSizeBytes = 1024 * 1024 * 10;  //10 MB
+            tuningLog = false;
 
             Preset1Name = Preset2Name = Preset3Name = Preset4Name = Preset5Name = "";
             Preset1Az = Preset2Az = Preset3Az = Preset4Az = Preset5Az = 0.0;
@@ -236,6 +237,7 @@ namespace DishControl
         public string positionFileLog { get; set; }
         public int maxPosLogSizeBytes { get; set; }
         public int maxPosLogFiles { get; set; }
+        public bool tuningLog { get; set; }
 
         public string Preset1Name { get; set; }
         public double Preset1Az { get; set; }

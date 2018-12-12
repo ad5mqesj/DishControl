@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 
 using System.Windows.Forms;
+using System.Diagnostics;
 
 #if _TEST
 using InterfaceFake;
@@ -33,6 +34,7 @@ namespace DishControl
         buttonDir direction;
         List<presets> Presets = null;
         int currentIncrement = 0;
+        Stopwatch sw;
 
         public MainForm(Eth32 dev)
         {
@@ -81,10 +83,11 @@ namespace DishControl
                 }
                 presetSelector.SelectedIndex = 0;
                 RollingLogger.setupRollingLogger(Program.settings.positionFileLog, Program.settings.maxPosLogSizeBytes, Program.settings.maxPosLogFiles);
+                sw = Stopwatch.StartNew();
                 //we are configured so signal the Connect event so main motion can connect hardware
                 Program.state.connectEvent.Set();
                 mainTimer = new System.Windows.Forms.Timer();
-                mainTimer.Interval = 200;
+                mainTimer.Interval = 150;
                 mainTimer.Tick += new EventHandler(TimerEventProcessor);
                 mainTimer.Start();
             }//if config exists
@@ -217,8 +220,15 @@ namespace DishControl
             //log position every tenth time through
             string posLog = string.Format("RA {0:D3} : {1:D2}\t DEC {2:D3} : {3:D2}", RA.Degrees, RA.Minutes, Dec.Degrees, Dec.Minutes);
             currentIncrement++;
-            if (currentIncrement % 9 == 0)
+            if (!Program.settings.tuningLog && currentIncrement % 5 == 0)
             {
+                RollingLogger.LogMessage(posLog);
+                currentIncrement = 0;
+            }
+            else if (Program.settings.tuningLog)
+            {
+                long time = sw.ElapsedMilliseconds;
+                posLog = string.Format("{0},{1},{2}", time, Program.state.azimuth, Program.state.elevation);
                 RollingLogger.LogMessage(posLog);
                 currentIncrement = 0;
             }
