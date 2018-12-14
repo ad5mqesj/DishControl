@@ -220,7 +220,7 @@ namespace DishControl
             //log position every tenth time through
             string posLog = string.Format("RA {0:D3} : {1:D2}\t DEC {2:D3} : {3:D2}", RA.Degrees, RA.Minutes, Dec.Degrees, Dec.Minutes);
             currentIncrement++;
-            if (!Program.settings.tuningLog && currentIncrement % 5 == 0)
+            if (!Program.settings.tuningLog && currentIncrement % 20 == 0)
             {
                 RollingLogger.LogMessage(posLog);
                 currentIncrement = 0;
