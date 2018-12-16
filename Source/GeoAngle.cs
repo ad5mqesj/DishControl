@@ -113,7 +113,7 @@ namespace DishControl
 
         public static GeoAngle FromString (string point)
         {
-            var multiplier = (point.Contains("S") || point.Contains("W")) ? -1 : 1; //handle south and west
+            var multiplier = (point.Contains("S") || point.Contains("W") || point.Contains("-")) ? -1 : 1; //handle south and west
 
             point = Regex.Replace(point, "[^0-9. :]", ""); //remove the characters
 

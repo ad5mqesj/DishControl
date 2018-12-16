@@ -206,19 +206,27 @@ namespace DishControl
             {
                 Message.Text = "";
             }
-
+            double az, el;
+            az = Program.state.azimuth;
+            el = Program.state.elevation;
             //set up display variables in deg, min, sec format
-            GeoAngle AzAngle = GeoAngle.FromDouble(Program.state.azimuth, true);
-            GeoAngle ElAngle = GeoAngle.FromDouble(Program.state.elevation, true);
+            if (el > 89.99)
+            {
+                az -= 180.0;
+                if (az < 0.0) az += 360.0;
+                el -= 90.0;
+            }
+           GeoAngle AzAngle = GeoAngle.FromDouble(az, true);
+           GeoAngle ElAngle = GeoAngle.FromDouble(el, true);
 
             //convert to RA/DEC
-            RaDec astro = celestialConversion.CalcualteRaDec(Program.state.elevation, Program.state.azimuth, Program.settings.latitude, Program.settings.longitude);
+            RaDec astro = celestialConversion.CalcualteRaDec(el, az, Program.settings.latitude, Program.settings.longitude);
             //set up RA DEC as deg,min,sec
             GeoAngle Dec = GeoAngle.FromDouble(astro.Dec);
             GeoAngle RA = GeoAngle.FromDouble(astro.RA, true);
 
             //log position every tenth time through
-            string posLog = string.Format("RA {0:D3} : {1:D2}\t DEC {2:D3} : {3:D2}", RA.Degrees, RA.Minutes, Dec.Degrees, Dec.Minutes);
+            string posLog = string.Format("RA {0:D3} : {1:D2}\t DEC {2}{3:D3} : {4:D2}", RA.Degrees, RA.Minutes, Dec.IsNegative?"-":"", Dec.Degrees, Dec.Minutes);
             currentIncrement++;
             if (!Program.settings.tuningLog && currentIncrement % 20 == 0)
             {
@@ -228,7 +236,7 @@ namespace DishControl
             else if (Program.settings.tuningLog)
             {
                 long time = sw.ElapsedMilliseconds;
-                posLog = string.Format("{0},{1},{2}", time, Program.state.azimuth, Program.state.elevation);
+                posLog = string.Format("{0},{1},{2}", time, az, el);
                 RollingLogger.LogMessage(posLog);
                 currentIncrement = 0;
             }
@@ -239,7 +247,7 @@ namespace DishControl
 
             //show RA,DEC on main form
             this.RA.Text = string.Format("{0:D3} : {1:D2}", RA.Degrees, RA.Minutes);
-            this.DEC.Text = string.Format("{0:D2} : {1:D2}", Dec.Degrees, Dec.Minutes);
+            this.DEC.Text = string.Format("{0}{1:D2} : {2:D2}", Dec.IsNegative ? "-" : "", Dec.Degrees, Dec.Minutes);
 
             if (!string.IsNullOrEmpty(Program.state.errorMessage))
             {
@@ -255,8 +263,6 @@ namespace DishControl
                 this.commandAz.Text = string.Format("{0:D3} : {1:D2}", cAzAngle.Degrees, cAzAngle.Minutes);
                 this.commandEl.Text = string.Format("{0:D2} : {1:D2}", cElAngle.Degrees, cElAngle.Minutes);
             }
-
-
 
         }
 
