@@ -45,6 +45,7 @@ namespace DishControl
             this.label6 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.SouthPark = new System.Windows.Forms.Button();
             this.presetSelector = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.lunarTrack = new System.Windows.Forms.Button();
@@ -72,7 +73,10 @@ namespace DishControl
             this.CCW = new System.Windows.Forms.Button();
             this.Down = new System.Windows.Forms.Button();
             this.Message = new System.Windows.Forms.Label();
-            this.SouthPark = new System.Windows.Forms.Button();
+            this.displayToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.showSecondsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.rADegreesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.showSkyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -104,7 +108,8 @@ namespace DishControl
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.optionsToolStripMenuItem,
-            this.driveTestToolStripMenuItem});
+            this.driveTestToolStripMenuItem,
+            this.displayToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(744, 24);
@@ -131,6 +136,7 @@ namespace DishControl
             this.driveTestToolStripMenuItem.Name = "driveTestToolStripMenuItem";
             this.driveTestToolStripMenuItem.Size = new System.Drawing.Size(70, 20);
             this.driveTestToolStripMenuItem.Text = "Drive Test";
+            this.driveTestToolStripMenuItem.Visible = false;
             this.driveTestToolStripMenuItem.Click += new System.EventHandler(this.driveTestToolStripMenuItem_Click);
             // 
             // label1
@@ -258,6 +264,16 @@ namespace DishControl
             this.groupBox2.TabIndex = 17;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Command Position";
+            // 
+            // SouthPark
+            // 
+            this.SouthPark.Location = new System.Drawing.Point(98, 178);
+            this.SouthPark.Name = "SouthPark";
+            this.SouthPark.Size = new System.Drawing.Size(75, 23);
+            this.SouthPark.TabIndex = 26;
+            this.SouthPark.Text = "South Park";
+            this.SouthPark.UseVisualStyleBackColor = true;
+            this.SouthPark.Click += new System.EventHandler(this.SouthPark_Click);
             // 
             // presetSelector
             // 
@@ -529,15 +545,33 @@ namespace DishControl
             this.Message.Size = new System.Drawing.Size(0, 13);
             this.Message.TabIndex = 23;
             // 
-            // SouthPark
+            // displayToolStripMenuItem
             // 
-            this.SouthPark.Location = new System.Drawing.Point(98, 178);
-            this.SouthPark.Name = "SouthPark";
-            this.SouthPark.Size = new System.Drawing.Size(75, 23);
-            this.SouthPark.TabIndex = 26;
-            this.SouthPark.Text = "South Park";
-            this.SouthPark.UseVisualStyleBackColor = true;
-            this.SouthPark.Click += new System.EventHandler(this.SouthPark_Click);
+            this.displayToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.showSecondsToolStripMenuItem,
+            this.rADegreesToolStripMenuItem,
+            this.showSkyToolStripMenuItem});
+            this.displayToolStripMenuItem.Name = "displayToolStripMenuItem";
+            this.displayToolStripMenuItem.Size = new System.Drawing.Size(57, 20);
+            this.displayToolStripMenuItem.Text = "Display";
+            // 
+            // showSecondsToolStripMenuItem
+            // 
+            this.showSecondsToolStripMenuItem.Name = "showSecondsToolStripMenuItem";
+            this.showSecondsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.showSecondsToolStripMenuItem.Text = "Show Seconds";
+            // 
+            // rADegreesToolStripMenuItem
+            // 
+            this.rADegreesToolStripMenuItem.Name = "rADegreesToolStripMenuItem";
+            this.rADegreesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.rADegreesToolStripMenuItem.Text = "RA Degrees";
+            // 
+            // showSkyToolStripMenuItem
+            // 
+            this.showSkyToolStripMenuItem.Name = "showSkyToolStripMenuItem";
+            this.showSkyToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.showSkyToolStripMenuItem.Text = "Show Sky";
             // 
             // MainForm
             // 
@@ -621,6 +655,10 @@ namespace DishControl
         private System.Windows.Forms.ComboBox presetSelector;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button SouthPark;
+        private System.Windows.Forms.ToolStripMenuItem displayToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem showSecondsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem rADegreesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem showSkyToolStripMenuItem;
     }
 }
 

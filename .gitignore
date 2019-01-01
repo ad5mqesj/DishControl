@@ -5,5 +5,7 @@
 **/pacakges
 *.exe
 *.dll
+!WWA.dll
+*.pdb
 *.obj
 /packages
