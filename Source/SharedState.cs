@@ -33,6 +33,7 @@ namespace DishControl
             go = new ManualResetEvent(false);
 
             errorMessage = string.Empty;
+            SkyVisible = false;
         }
 
         public double azimuth { get; set; }
@@ -62,5 +63,6 @@ namespace DishControl
         public ManualResetEvent go;
 
         public string errorMessage { get; set; }
+        public bool SkyVisible { get; set; }
     }
 }

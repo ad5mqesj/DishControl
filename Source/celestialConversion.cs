@@ -20,13 +20,22 @@ namespace DishControl
         public double Dec { get; set; }
 
         public double distance { get; set; }
-        public void Normalize()
+        public void Normalize(bool hours = true)
         {
-            if (this.RA > 24.0)
-                this.RA = 24.0;
-            else if (this.RA < -0.0)
-                this.RA = 0.0;
-
+            if (hours)
+            {
+                if (this.RA > 24.0)
+                    this.RA = 24.0;
+                else if (this.RA < -0.0)
+                    this.RA = 0.0;
+            }
+            else
+            {
+                if (this.RA > 360.0)
+                    this.RA = 360.0;
+                else if (this.RA < -0.0)
+                    this.RA = 0.0;
+            }
             if (this.Dec > 180.0)
                 this.Dec = 180.0;
             else if (this.Dec < -180.0)
@@ -92,20 +101,21 @@ namespace DishControl
         /// <param name="Lat">The latitude in decimal degrees</param>
         /// <param name="Long">The longitude in decimal value</param>
         /// <returns>The Right Ascentsion and Decination decimal value</returns>
-        public static RaDec CalcualteRaDec(double Alt, double Az, double Lat, double Long)
+        public static RaDec CalcualteRaDec(double Alt, double Az, double Lat, double Long, bool hours = true)
         {
-            return CalcualteRaDec(Alt, Az, Lat, Long, DateTime.UtcNow);
+            return CalcualteRaDec(Alt, Az, Lat, Long, DateTime.UtcNow, hours);
         }
 
-       /// <summary>
-       /// </summary>
-       /// <param name="Alt">The Altitude (90-elevation) in decimal degrees</param>
-       /// <param name="Az">The Azimuth in decimal degrees</param>
-       /// <param name="Lat">The latitude in decimal degrees</param>
-       /// <param name="Long">The longitude in decimal value</param>
-       /// <param name="Date">The date(time) in UTC</param>
-       /// <returns>The Right Ascentsion and Decination decimal value</returns>
-        public static RaDec CalcualteRaDec(double Alt, double Az, double Lat, double Long, DateTime Date)
+        /// <summary>
+        /// </summary>
+        /// <param name="Alt">The Altitude (90-elevation) in decimal degrees</param>
+        /// <param name="Az">The Azimuth in decimal degrees</param>
+        /// <param name="Lat">The latitude in decimal degrees</param>
+        /// <param name="Long">The longitude in decimal value</param>
+        /// <param name="Date">The date(time) in UTC</param>
+        /// <param name="hours">if false degrees, else hours RA</param>
+        /// <returns>The Right Ascentsion and Decination decimal value</returns>
+        public static RaDec CalcualteRaDec(double Alt, double Az, double Lat, double Long, DateTime Date, bool hours = true)
         {
             double temp, sin_dec, lat = Lat * (Math.PI / 180);
             double cos_lat = Math.Cos(lat);
@@ -145,15 +155,15 @@ namespace DishControl
                     ha = Math.PI + temp;
             }
             double dayOffset = (Date - new DateTime(2000, 1, 1, 12, 0, 0, DateTimeKind.Utc)).TotalDays;
-            double LST = (100.46 + 0.985647 * dayOffset + Long + 15 * (Date.Hour + Date.Minute / 60d) + 360) % 360;
+            double LST = (100.46 + 0.985647 * dayOffset + Long + 15 * (Date.Hour + Date.Minute / 60d+ Date.Second/3600.0) + 360) % 360;
             ra = (LST - (ha * 180.0 / Math.PI) + 360) % 360;
-
+            double ramult = hours ? (24.0 / 360.0) : 1.0;
             RaDec rd =  new RaDec()
             {
-                RA = ra * 24 / 360,
+                RA = ra * ramult,
                 Dec = dec * 180.0 / Math.PI
             };
-            rd.Normalize();
+            rd.Normalize(hours);
             return rd;
         }
 

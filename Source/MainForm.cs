@@ -220,7 +220,7 @@ namespace DishControl
            GeoAngle ElAngle = GeoAngle.FromDouble(el, true);
 
             //convert to RA/DEC
-            RaDec astro = celestialConversion.CalcualteRaDec(el, az, Program.settings.latitude, Program.settings.longitude);
+            RaDec astro = celestialConversion.CalcualteRaDec(el, az, Program.settings.latitude, Program.settings.longitude, !rADegreesToolStripMenuItem.Checked);
             //set up RA DEC as deg,min,sec
             GeoAngle Dec = GeoAngle.FromDouble(astro.Dec);
             GeoAngle RA = GeoAngle.FromDouble(astro.RA, true);
@@ -240,15 +240,27 @@ namespace DishControl
                 RollingLogger.LogMessage(posLog);
                 currentIncrement = 0;
             }
+            
+            if (!showSecondsToolStripMenuItem.Checked)
+            {
+                //show AZ, EL on main form
+                this.Azimuth.Text = string.Format("{0:D3} : {1:D2}", AzAngle.Degrees, AzAngle.Minutes);
+                this.Elevation.Text = string.Format("{0:D2} : {1:D2}", ElAngle.Degrees, ElAngle.Minutes);
 
-            //show AZ, EL on main form
-            this.Azimuth.Text = string.Format("{0:D3} : {1:D2}", AzAngle.Degrees, AzAngle.Minutes);
-            this.Elevation.Text = string.Format("{0:D2} : {1:D2}", ElAngle.Degrees, ElAngle.Minutes);
+                //show RA,DEC on main form
+                this.RA.Text = string.Format("{0:D3} : {1:D2}", RA.Degrees, RA.Minutes);
+                this.DEC.Text = string.Format("{0}{1:D2} : {2:D2}", Dec.IsNegative ? "-" : "", Dec.Degrees, Dec.Minutes);
+            }
+            else
+            {
+                //show AZ, EL on main form
+                this.Azimuth.Text = string.Format("{0:D3} : {1:D2} : {2:D2}", AzAngle.Degrees, AzAngle.Minutes, (int)(AzAngle.Seconds+0.5)%60);
+                this.Elevation.Text = string.Format("{0:D2} : {1:D2} : {2:D2}", ElAngle.Degrees, ElAngle.Minutes, (int)(ElAngle.Seconds + 0.5)%60);
 
-            //show RA,DEC on main form
-            this.RA.Text = string.Format("{0:D3} : {1:D2}", RA.Degrees, RA.Minutes);
-            this.DEC.Text = string.Format("{0}{1:D2} : {2:D2}", Dec.IsNegative ? "-" : "", Dec.Degrees, Dec.Minutes);
-
+                //show RA,DEC on main form
+                this.RA.Text = string.Format("{0:D3} : {1:D2} : {2:D2}", RA.Degrees, RA.Minutes, (int)(RA.Seconds + 0.5)%60);
+                this.DEC.Text = string.Format("{0}{1:D2} : {2:D2} : {2:D2}", Dec.IsNegative ? "-" : "", Dec.Degrees, Dec.Minutes, (int)(Dec.Seconds + 0.5)%60);
+            }
             if (!string.IsNullOrEmpty(Program.state.errorMessage))
             {
                 Message.Text = Program.state.errorMessage;
@@ -492,6 +504,23 @@ namespace DishControl
 
             Program.state.command = CommandType.Move;
             Program.state.go.Set();
+        }
+
+        private void ShowSecondsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            showSecondsToolStripMenuItem.Checked = !showSecondsToolStripMenuItem.Checked;
+        }
+
+        private void RADegreesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            rADegreesToolStripMenuItem.Checked = !rADegreesToolStripMenuItem.Checked;
+        }
+
+        private void ShowSkyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            showSkyToolStripMenuItem.Enabled = Program.state.SkyVisible;
+            SkyMap sky = new SkyMap();
+            sky.Show();
         }
     }
 }

@@ -35,6 +35,10 @@ namespace DishControl
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.driveTestToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.displayToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.showSecondsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.rADegreesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.showSkyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.label1 = new System.Windows.Forms.Label();
             this.RA = new System.Windows.Forms.Label();
             this.DEC = new System.Windows.Forms.Label();
@@ -73,10 +77,6 @@ namespace DishControl
             this.CCW = new System.Windows.Forms.Button();
             this.Down = new System.Windows.Forms.Button();
             this.Message = new System.Windows.Forms.Label();
-            this.displayToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.showSecondsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.rADegreesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.showSkyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -138,6 +138,37 @@ namespace DishControl
             this.driveTestToolStripMenuItem.Text = "Drive Test";
             this.driveTestToolStripMenuItem.Visible = false;
             this.driveTestToolStripMenuItem.Click += new System.EventHandler(this.driveTestToolStripMenuItem_Click);
+            // 
+            // displayToolStripMenuItem
+            // 
+            this.displayToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.showSecondsToolStripMenuItem,
+            this.rADegreesToolStripMenuItem,
+            this.showSkyToolStripMenuItem});
+            this.displayToolStripMenuItem.Name = "displayToolStripMenuItem";
+            this.displayToolStripMenuItem.Size = new System.Drawing.Size(57, 20);
+            this.displayToolStripMenuItem.Text = "Display";
+            // 
+            // showSecondsToolStripMenuItem
+            // 
+            this.showSecondsToolStripMenuItem.Name = "showSecondsToolStripMenuItem";
+            this.showSecondsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.showSecondsToolStripMenuItem.Text = "Show Seconds";
+            this.showSecondsToolStripMenuItem.Click += new System.EventHandler(this.ShowSecondsToolStripMenuItem_Click);
+            // 
+            // rADegreesToolStripMenuItem
+            // 
+            this.rADegreesToolStripMenuItem.Name = "rADegreesToolStripMenuItem";
+            this.rADegreesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.rADegreesToolStripMenuItem.Text = "RA Degrees";
+            this.rADegreesToolStripMenuItem.Click += new System.EventHandler(this.RADegreesToolStripMenuItem_Click);
+            // 
+            // showSkyToolStripMenuItem
+            // 
+            this.showSkyToolStripMenuItem.Name = "showSkyToolStripMenuItem";
+            this.showSkyToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.showSkyToolStripMenuItem.Text = "Show Sky";
+            this.showSkyToolStripMenuItem.Click += new System.EventHandler(this.ShowSkyToolStripMenuItem_Click);
             // 
             // label1
             // 
@@ -235,7 +266,7 @@ namespace DishControl
             this.groupBox1.Controls.Add(this.DEC);
             this.groupBox1.Location = new System.Drawing.Point(12, 27);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(390, 102);
+            this.groupBox1.Size = new System.Drawing.Size(414, 102);
             this.groupBox1.TabIndex = 16;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Actual Position";
@@ -544,34 +575,6 @@ namespace DishControl
             this.Message.Name = "Message";
             this.Message.Size = new System.Drawing.Size(0, 13);
             this.Message.TabIndex = 23;
-            // 
-            // displayToolStripMenuItem
-            // 
-            this.displayToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.showSecondsToolStripMenuItem,
-            this.rADegreesToolStripMenuItem,
-            this.showSkyToolStripMenuItem});
-            this.displayToolStripMenuItem.Name = "displayToolStripMenuItem";
-            this.displayToolStripMenuItem.Size = new System.Drawing.Size(57, 20);
-            this.displayToolStripMenuItem.Text = "Display";
-            // 
-            // showSecondsToolStripMenuItem
-            // 
-            this.showSecondsToolStripMenuItem.Name = "showSecondsToolStripMenuItem";
-            this.showSecondsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.showSecondsToolStripMenuItem.Text = "Show Seconds";
-            // 
-            // rADegreesToolStripMenuItem
-            // 
-            this.rADegreesToolStripMenuItem.Name = "rADegreesToolStripMenuItem";
-            this.rADegreesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.rADegreesToolStripMenuItem.Text = "RA Degrees";
-            // 
-            // showSkyToolStripMenuItem
-            // 
-            this.showSkyToolStripMenuItem.Name = "showSkyToolStripMenuItem";
-            this.showSkyToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.showSkyToolStripMenuItem.Text = "Show Sky";
             // 
             // MainForm
             // 
